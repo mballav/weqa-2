@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBlack">
+
+    <ImageView
+        android:id="@+id/appname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/weqalogo_v1_400"/>
+
+    <TextView
+        android:id="@+id/appslogan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Application has encountered an unexpected error!"
+        android:textAlignment="center"
+        android:textColor="@color/colorTABtextSelected"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/appname"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appslogan"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        >
+
+        <Button
+            android:id="@+id/restartButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner_button"
+            android:layout_alignParentStart="true"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Restart App"
+            android:textColor="@color/colorLighterGrey"/>
+
+        <Button
+            android:id="@+id/exitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner_button"
+            android:text="Exit"
+            android:textColor="@color/colorLighterGrey"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_toRightOf="@id/restartButton"
+            android:layout_marginLeft="20dp"
+            />
+
+    </RelativeLayout>
+</RelativeLayout>

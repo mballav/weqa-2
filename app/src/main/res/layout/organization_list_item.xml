@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/orgContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="20dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
+    android:background="@drawable/avail_list_rectangle"
+    >
+
+    <TextView
+        android:id="@+id/orgName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:textSize="18sp"
+        android:text="WEQA-1"
+        android:textColor="@color/colorMENU"/>
+
+    <TextView
+        android:id="@+id/privilege"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_below="@id/orgName"
+        android:layout_marginTop="7dp"
+        android:text="Administrator"
+        android:textSize="12sp"
+        android:textColor="@color/colorDarkGrey"
+        />
+
+    <Button
+        android:id="@+id/guestButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_below="@id/privilege"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:layout_marginTop="7dp"
+        android:text="Guest Access"
+        android:textColor="@color/colorTABtext"
+        android:background="@color/colorMENU"/>
+
+    <ImageView
+        android:id="@+id/defaultImage"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:src="@drawable/ic_star_border_black_24dp"
+        android:tint="@color/colorGreen"/>
+
+</RelativeLayout>

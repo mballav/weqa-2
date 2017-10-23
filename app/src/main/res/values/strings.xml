@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">WEQA</string>
+    <string name="no_selection">No results</string>
+    <string name="code_sent">Activation code has been sent to your mobile and email-address. Please enter the code to complete registration.</string>
+    <string name="new_code_sent">Entered code has expired. New activation code has been sent to your mobile and email-address. Please enter the new code to complete registration.</string>
+    <string name="invalid_code">Entered code was invalid. Please enter valid code or click on "Resend Code"</string>
+    <string name="code_resent">Activation code has been re-sent to your mobile and email-address. Please enter the code to complete registration.</string>
+    <string name="code_sent2">If you received an activation code to connect to an Organization, please enter it here.</string>
+
+    <string name="add_org_msg1">Another user is connected with the mobile number provided</string>
+    <string name="add_org_msg2">Mobile number not found for any organisation</string>
+    <string name="activate_org_msg">Organisation connected successfully</string>
+
+    <string-array name="planets">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Uranus</item>
+        <item>Neptune</item>
+        <item>Pluto</item>
+    </string-array>
+</resources>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
+
+    <Button
+        android:id="@+id/doneButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Done"
+        android:textAllCaps="false"
+        android:textAlignment="viewStart"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@color/colorMENU"
+        android:textColor="@color/colorTABtext"
+        android:elevation="10dp"
+        android:layout_alignParentTop="true"/>
+
+    <View
+        android:id="@+id/anchor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"/>
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/doneButton"
+        android:layout_above="@id/anchor"
+        android:id="@+id/zxing_barcode_scanner"
+        app:zxing_use_texture_view="false"
+        app:zxing_preview_scaling_strategy="fitXY"/>
+
+    <GridLayout
+        android:id="@+id/middlePanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/anchor"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:columnCount="2"
+        android:elevation="10dp"
+        android:alignmentMode="alignBounds"
+        android:background="@color/colorMENU">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/nameText"
+            android:text="Amarjit Singh"
+            android:textColor="@color/colorTABtext"
+            android:textAlignment="center"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center_vertical"
+            android:layout_margin="10dp"
+            android:padding="5dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mobileText"
+            android:text="7898906545"
+            android:textColor="@color/colorTABtext"
+            android:textAlignment="center"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center_vertical"
+            android:layout_margin="10dp"
+            android:padding="5dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/endDate"
+            android:text="July 2, 2017"
+            android:textColor="@color/colorTABtext"
+            android:textAlignment="center"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center_vertical"
+            android:layout_margin="10dp"
+            android:padding="5dp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill|center_vertical"
+            android:layout_margin="10dp"
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/grantButton"
+                android:text="Grant Access"
+                android:textAllCaps="false"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:background="@drawable/super_rounded_button_darkgrey"
+                android:textColor="@color/colorDarkGrey"
+                android:layout_centerHorizontal="true"
+                />
+
+            <ProgressBar
+                android:id="@+id/progress1"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignBottom="@id/grantButton"
+                android:layout_alignTop="@id/grantButton"
+                android:layout_centerHorizontal="true"
+                android:indeterminate="true"
+                android:elevation="2dp"
+                android:indeterminateTint="@color/colorLighterGrey"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+    </GridLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/grantList"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/middlePanel"
+        android:layout_alignParentBottom="true" />
+
+    <RelativeLayout
+        android:id="@+id/progressBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/middlePanel"
+        android:layout_alignParentBottom="true"
+        >
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminateDrawable="@drawable/progress"></ProgressBar>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container"
+    android:background="@color/colorMENU">
+
+    <LinearLayout
+        android:id="@+id/topPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/addOrgImage"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_add_circle_outline_black_24dp"
+            android:tint="@color/colorTABtextSelected"
+            android:layout_marginTop="30dp"/>
+
+        <TextView
+            android:id="@+id/addOrgText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Organization"
+            android:textColor="@color/colorTABtext"
+            android:layout_marginTop="10dp"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/code_sent2"
+        android:textAlignment="center"
+        android:textColor="@color/colorLightGrey"
+        android:textSize="10sp"
+        android:textStyle="italic"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/topPanel"
+        android:layout_marginTop="20dp"
+        android:maxLines="3"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        />
+
+    <LinearLayout
+        android:id="@+id/codeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/info"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="right|top"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/activationCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/edit_text_rectangle"
+                android:hint="Activation Code"
+                android:textStyle="italic"
+                android:minHeight="0dp"
+                android:textColor="@color/colorLightGrey"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:layout_marginRight="10dp"
+                />
+
+            <RelativeLayout
+                android:layout_marginRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/resendCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_centerHorizontal="true"
+                    android:text="Resend Code"
+                    android:textColor="@color/colorLighterGrey"/>
+
+                <ProgressBar
+                    android:id="@+id/progress3"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignBottom="@id/resendCode"
+                    android:layout_alignTop="@id/resendCode"
+                    android:layout_centerHorizontal="true"
+                    android:indeterminate="true"
+                    android:elevation="2dp"
+                    android:indeterminateTint="@color/colorLighterGrey"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="left|top"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp">
+
+                <Button
+                    android:id="@+id/activateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Activate"
+                    android:minHeight="0dp"
+                    android:padding="5dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorLighterGrey"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    android:background="@drawable/super_rounded_button_darkblue"
+                    android:layout_centerVertical="true"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/progress2"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignBottom="@id/activateButton"
+                    android:layout_alignTop="@id/activateButton"
+                    android:layout_centerHorizontal="true"
+                    android:indeterminate="true"
+                    android:elevation="2dp"
+                    android:indeterminateTint="@color/colorLighterGrey"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/orgList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/codeContainer"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        ></android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:id="@+id/progressBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/codeContainer"
+        android:layout_alignParentBottom="true"
+        >
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminateDrawable="@drawable/progress"></ProgressBar>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

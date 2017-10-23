@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container"
+    android:background="@color/colorMENU"
+    android:focusableInTouchMode="true">
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_keyboard_arrow_left_black_24dp"
+        android:tint="@color/colorLightGrey"
+        android:scaleType="fitXY"
+        />
+
+    <LinearLayout
+        android:id="@+id/topPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_group_black_24dp"
+            android:tint="@color/colorTABtextSelected"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:text="Create Team"
+            android:textColor="@color/colorTABtext"
+            android:textSize="18sp"
+            />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorLighterGrey"
+        android:layout_below="@id/topPanel"
+        android:layout_marginTop="15dp" />
+
+    <LinearLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/line2"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:orientation="vertical"
+        >
+        <Spinner
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"
+            android:popupBackground="@color/colorMENU"
+            android:background="@color/colorMENU"
+            android:gravity="left"
+            />
+
+            <EditText
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:id="@+id/teamName"
+                android:textColor="@color/colorTABtext"
+                android:background="@color/colorMENU"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:hint="Name"
+                android:textSize="12sp"
+                android:gravity="left"
+                android:padding="4dp"
+                />
+
+            <EditText
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:id="@+id/teamPurpose"
+                android:textColor="@color/colorTABtext"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:hint="Purpose (optional)"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:padding="4dp"
+                android:background="@color/colorMENU"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/line3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDarkGrey"
+        android:layout_below="@id/tableLayout1"
+        android:layout_marginTop="10dp" />
+
+    <LinearLayout
+        android:id="@+id/nextToTopPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/line3"
+        android:background="@color/colorPrimaryDark"
+        android:paddingBottom="10dp"
+        android:paddingTop="5dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        >
+        <ImageView
+            android:id="@+id/addMember"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_add_circle_outline_black_24dp"
+            android:tint="@color/colorTABtextSelected"
+            android:scaleType="fitXY"
+            />
+
+        <TextView
+            android:id="@+id/addMemberText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Add members"
+            android:textSize="12sp"
+            android:textColor="@color/colorTABtext"
+            />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:minHeight="0dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorLightGrey"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@color/colorMENU"
+        android:layout_alignParentBottom="true"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/saveButton"
+        android:layout_below="@id/nextToTopPanel"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/colorPrimaryDark"
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/memberList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminateDrawable="@drawable/progress"></ProgressBar>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

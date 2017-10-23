@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorTABtext">
+
+  <Button
+      android:id="@+id/doneButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Done"
+      android:textAllCaps="false"
+      android:textAlignment="viewStart"
+      android:textSize="18sp"
+      android:textColor="@color/colorTABtext"
+      android:background="@color/colorMENU"
+      android:paddingTop="7dp"
+      android:paddingBottom="7dp"
+      android:paddingLeft="15dp"
+      />
+
+  <LinearLayout
+      android:id="@+id/qrContainer"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/doneButton"
+      android:layout_marginTop="30dp"
+      android:background="@color/colorTABtext"
+      >
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.25"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        android:gravity="center"
+        android:orientation="vertical">
+
+      <ImageView
+          android:id="@+id/qrCode"
+          android:layout_weight="1"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:adjustViewBounds="true"
+          android:scaleType="fitXY"
+          android:layout_centerHorizontal="true"/>
+
+      <TextView
+          android:id="@+id/nameText"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerHorizontal="true"
+          android:textColor="@color/colorDarkGrey"
+          android:layout_marginBottom="30dp"
+          android:layout_marginTop="10dp"
+          android:textSize="18sp"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.25"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+  </LinearLayout>
+
+
+  <TableLayout
+      android:id="@+id/tableLayout1"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/qrContainer"
+      android:background="@color/colorMENU"
+      android:elevation="10dp"
+      android:stretchColumns="*"
+      >
+    <TableRow  android:gravity="center">
+
+      <TextView
+          android:id="@+id/emailText"
+          android:gravity="center"
+          style="@style/profiletext"
+          />
+
+    </TableRow>
+
+    <View
+        android:layout_height="1dp"
+        android:background="@color/colorLighterGrey" />
+
+    <TableRow  android:gravity="center">
+
+      <TextView
+          android:id="@+id/mobileText"
+          android:gravity="center"
+          style="@style/profiletext"
+          />
+
+    </TableRow>
+
+    <View
+        android:layout_height="1dp"
+        android:background="@color/colorLighterGrey" />
+
+  </TableLayout>
+
+
+  <ScrollView
+      android:id="@+id/bottomPanel"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@id/tableLayout1"
+      android:layout_alignParentBottom="true"
+      >
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorMENU"
+        android:stretchColumns="*"
+        >
+
+      <TableRow  android:gravity="center">
+
+        <RelativeLayout
+            android:gravity="center">
+
+          <TextView
+              android:id="@+id/text0"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Organizations"
+              android:layout_centerHorizontal="true"
+              style="@style/profiletext3"
+              />
+
+          <ProgressBar
+              android:id="@+id/progress1"
+              style="?android:attr/progressBarStyleSmall"
+              android:layout_width="48dp"
+              android:layout_height="48dp"
+              android:layout_alignBottom="@id/text0"
+              android:layout_alignTop="@id/text0"
+              android:layout_centerHorizontal="true"
+              android:indeterminate="true"
+              android:elevation="2dp"
+              android:indeterminateTint="@color/colorLighterGrey"
+              android:visibility="gone" />
+
+        </RelativeLayout>
+
+      </TableRow>
+
+      <View
+          android:layout_height="1dp"
+          android:background="@color/colorLighterGrey" />
+
+      <TableRow  android:gravity="center">
+
+        <TextView
+            android:id="@+id/text1"
+            android:text="Team Events"
+            android:gravity="center"
+            style="@style/profiletext3"
+            />
+
+      </TableRow>
+
+      <View
+          android:layout_height="1dp"
+          android:background="@color/colorLighterGrey" />
+
+      <TableRow  android:gravity="center">
+
+        <TextView
+            android:id="@+id/text2"
+            android:text="Meetings"
+            android:gravity="center"
+            style="@style/profiletext3"
+            />
+
+      </TableRow>
+
+      <View
+          android:layout_height="1dp"
+          android:background="@color/colorLighterGrey" />
+
+      <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/text3"
+            android:text="Help"
+            android:gravity="center"
+            style="@style/profiletext3"
+            />
+
+      </TableRow>
+
+      <View
+          android:layout_height="1dp"
+          android:background="@color/colorLighterGrey" />
+
+
+      <TableRow android:gravity="center" >
+
+        <TextView
+            android:id="@+id/text4"
+            android:text="Privacy &amp; Terms"
+            android:gravity="center"
+            style="@style/profiletext3"
+            />
+
+      </TableRow>
+
+    </TableLayout>
+
+  </ScrollView>
+</RelativeLayout>
