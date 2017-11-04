@@ -43,6 +43,7 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
     private ArrayList<TeamMemberListItem> newlyAddedUsers = new ArrayList<TeamMemberListItem>();
 
     private long orgId, screenId;
+    private String mobileNumber;
 
     private BarcodeCallback callback = new BarcodeCallback() {
         @Override
@@ -58,6 +59,11 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
 
             if (!isValidUserCode(code)) {
                 barcodeView.setStatusText("Invalid QR Code!");
+                return;
+            }
+
+            if (isUserSelf(code)) {
+                barcodeView.setStatusText("You cannot add self!");
                 return;
             }
 
@@ -94,6 +100,8 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
 
         orgId = intent.getIntExtra("ORG_ID", 0);
         screenId = intent.getIntExtra("SCREEN_ID", 0);
+
+        mobileNumber = intent.getStringExtra("MOBILE");
 
         this.alreadyAddedUsers = intent.getParcelableArrayListExtra("EXISTING_USERS");
 
@@ -195,7 +203,8 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
     }
 
     private boolean isValidUserCode(String code) {
-        return code.startsWith(CodeConstants.QR_CODE_MEMBER);
+        String[] tokens = code.split(",");
+        return (code.startsWith(CodeConstants.QR_CODE_MEMBER) && (tokens.length == 7));
     }
 
     private boolean isUserFromAcceptableOrg(String code) {
@@ -218,6 +227,14 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
     private String getUuid(String code) {
         String[] tokens = code.split(",");
         return tokens[1];
+    }
+
+    private boolean isUserSelf(String code) {
+        String[] tokens = code.split(",");
+        if (mobileNumber.equals(tokens[6])) {
+            return true;
+        }
+        return false;
     }
 
     private boolean isUserAlreadyPartOfTeam(String uuid) {

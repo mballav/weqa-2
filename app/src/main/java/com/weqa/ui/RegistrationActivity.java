@@ -1,5 +1,7 @@
 package com.weqa.ui;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -81,30 +84,41 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
 
         if (i != null) {
 
-            String fName = i.getStringExtra("FIRST_NAME");
-            String lName = i.getStringExtra("LAST_NAME");
-            String em = i.getStringExtra("EMAIL");
-            mobileNo = i.getStringExtra("MOBILE");
-            String dName = i.getStringExtra("DEVICE_NAME");
+            String screenName = i.getStringExtra("SCREEN_NAME");
 
-            firstName.setText(fName);
-            lastName.setText(lName);
-            email.setText(em);
-            mobile.setText(mobileNo);
-            deviceName.setText(dName);
+            if (screenName != null && screenName.equals("ExistingUser")) {
+                mobileNo = i.getStringExtra("MOBILE");
+                String dName = i.getStringExtra("DEVICE_NAME");
 
-            if (mobileNo != null && (!mobileNo.equals(""))) {
-                firstName.addTextChangedListener(textWatcher);
-                lastName.addTextChangedListener(textWatcher);
-                email.addTextChangedListener(textWatcher);
-                mobile.addTextChangedListener(textWatcher);
-                deviceName.addTextChangedListener(textWatcher);
+                mobile.setText(mobileNo);
+                deviceName.setText(dName);
+            }
+            else {
+                String fName = i.getStringExtra("FIRST_NAME");
+                String lName = i.getStringExtra("LAST_NAME");
+                String em = i.getStringExtra("EMAIL");
+                mobileNo = i.getStringExtra("MOBILE");
+                String dName = i.getStringExtra("DEVICE_NAME");
 
-                register.setEnabled(false);
-                register.setClickable(false);
-                register.setBackgroundResource(R.drawable.super_rounded_button_darkgrey);
+                firstName.setText(fName);
+                lastName.setText(lName);
+                email.setText(em);
+                mobile.setText(mobileNo);
+                deviceName.setText(dName);
 
-                enableActivationCodeInput();
+                if (mobileNo != null && (!mobileNo.equals(""))) {
+                    firstName.addTextChangedListener(textWatcher);
+                    lastName.addTextChangedListener(textWatcher);
+                    email.addTextChangedListener(textWatcher);
+                    mobile.addTextChangedListener(textWatcher);
+                    deviceName.addTextChangedListener(textWatcher);
+
+                    register.setEnabled(false);
+                    register.setClickable(false);
+                    register.setBackgroundResource(R.drawable.super_rounded_button_darkgrey);
+
+                    enableActivationCodeInput();
+                }
             }
         }
 
@@ -113,13 +127,6 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
 
         register.setOnClickListener(this);
 
-        ImageView closeImage = (ImageView) findViewById(R.id.closeImage);
-        closeImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
     }
 
     @Override
@@ -228,10 +235,12 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
 
     public void afterRegistration(RegistrationResponse response) {
 
-        if (response.getResult()) {
+        if (response.getResponseCode().equals(CodeConstants.RC16)) {
 
-            // User has been registered. No matching prior registration is found.
-            // So, the user is new. Activation has been sent by SMS and E-mail.
+            // User has been registered. No matching prior registration is found, or, if prior registration
+            // is found, it is not verified. So, the user is new. Even if unverified prior registration is
+            // found, it is overwritten with new information and the case is treated as a new user.
+            // Activation has been sent by SMS and E-mail.
             // Now, the mobile user should be prompted to enter the activation code.
 
             progress1.setVisibility(View.GONE);
@@ -244,6 +253,57 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
 
             enableActivationCodeInput();
         }
+        else if (response.getResponseCode().equals(CodeConstants.RC15)) {
+            DialogUtil.showOkDialog(this, this.getString(R.string.incorrect_mobile), false);
+        }
+        else if (response.getResponseCode().equals(CodeConstants.RC14)) {
+            showMobileRegisteredDialog(this.getString(R.string.mobile_already_registered));
+        }
+    }
+
+    public void showMobileRegisteredDialog(String textToDisplay) {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_booking);
+
+        // set the custom dialog components - text, image and button
+        TextView text = (TextView) dialog.findViewById(R.id.bookingmessage);
+        text.setText(textToDisplay);
+
+        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
+        cancelButton.setText("Edit Details");
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                register.setEnabled(true);
+                register.setClickable(true);
+                register.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
+
+                firstName.removeTextChangedListener(textWatcher);
+                lastName.removeTextChangedListener(textWatcher);
+                email.removeTextChangedListener(textWatcher);
+                mobile.removeTextChangedListener(textWatcher);
+                deviceName.removeTextChangedListener(textWatcher);
+            }
+        });
+
+        Button okButton = (Button) dialog.findViewById(R.id.okButton);
+        // if button is clicked, close the custom dialog
+        okButton.setText("Existing User?");
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(RegistrationActivity.this, ExistingUserActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("MOBILE", mobile.getText().toString().replaceAll("[^\\d]", ""));
+                i.putExtra("DEVICE_NAME", deviceName.getText().toString());
+                startActivity(i);
+            }
+        });
+
+        dialog.show();
     }
 
     private void  enableActivationCodeInput() {
@@ -270,6 +330,9 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
     public void sendCode() {
 
         String activationCode = code.getText().toString();
+
+        // after reading the activation code, clear the activation code edittext
+        code.setText("");
 
         progress2.setVisibility(View.VISIBLE);
         activateButton.setEnabled(false);

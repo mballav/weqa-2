@@ -21,11 +21,13 @@ public class OrgListData {
 
     private static final String LOG_TAG = "WEQA-LOG";
 
-    SharedPreferencesUtil util;
     List<OrgListItem> orgList;
+    Authentication auth;
+    int defaultOrgId;
 
-    public OrgListData(Context c) {
-        util = new SharedPreferencesUtil(c);
+    public OrgListData(Context c, Authentication auth, int defaultOrgId) {
+        this.auth = auth;
+        this.defaultOrgId = defaultOrgId;
         initialize();
 /*      Data added for testing purposes
         OrgListItem item = new OrgListItem();
@@ -46,8 +48,6 @@ public class OrgListData {
     }
 
     private void initialize() {
-        Authentication auth = util.getAuthenticationInfo();
-        int defaultOrgId = util.getDefaultOrganization();
         orgList = new ArrayList<OrgListItem>();
 
         if (auth != null) {

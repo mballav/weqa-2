@@ -18,6 +18,17 @@ public class RegistrationResponse {
     @SerializedName("mobileNo")
     @Expose
     private String mobileNo;
+    @SerializedName("responseCode")
+    @Expose
+    private String responseCode;
+
+    public String getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
 
     public Boolean getResult() {
         return result;

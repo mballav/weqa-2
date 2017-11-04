@@ -62,6 +62,8 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
     private List<Org> orgList;
     private List<String> orgNameList;
 
+    private String mobileNumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +75,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
 
         Authentication auth = util.getAuthenticationInfo();
         orgList = auth.getOrganization();
+        mobileNumber = auth.getMobileNo();
 
         spinner = (Spinner) findViewById(R.id.spinner);
 
@@ -249,6 +252,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
         Intent intent=new Intent(this, CustomQRScannerActivity.class);
         int position = spinner.getSelectedItemPosition();
         intent.putExtra("ORG_ID", getOrgId(position));
+        intent.putExtra("MOBILE", mobileNumber);
 
         Log.d(LOG_TAG, "-------------------------------------------- ORG ID = " + getOrgId(position));
 

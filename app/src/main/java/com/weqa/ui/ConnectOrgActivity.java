@@ -26,6 +26,7 @@ import com.weqa.framework.CustomCallback;
 import com.weqa.framework.MyCall;
 import com.weqa.model.AuthInput;
 import com.weqa.model.AuthResponse;
+import com.weqa.model.Authentication;
 import com.weqa.model.CodeConstants;
 import com.weqa.model.adapterdata.OrgListData;
 import com.weqa.model.adapterdata.OrgListItem;
@@ -68,6 +69,9 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
     private RelativeLayout progressBarContainer;
 
     private String orgMobileNo = "";
+    private String mobileNumber;
+
+    private SharedPreferencesUtil util;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +79,13 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
         Thread.setDefaultUncaughtExceptionHandler(new GlobalExceptionHandler(this));
         setContentView(R.layout.activity_connect_org);
 
+        util = new SharedPreferencesUtil(this);
+        Authentication auth = util.getAuthenticationInfo();
+        int defaultOrgId = util.getDefaultOrganization();
+        mobileNumber = auth.getMobileNo();
+
         orgList = (RecyclerView) findViewById(R.id.orgList);
-        orgListData = new OrgListData(this);
+        orgListData = new OrgListData(this, auth, defaultOrgId);
         orgListAdapter = new OrgListAdapter(orgListData, this);
 
         LinearLayoutManager layoutManagerNew = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -111,6 +120,15 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
         container.setOnTouchListener(this);
 
         KeyboardUtil.hideSoftKeyboard(this);
+
+        Button doneButton = (Button) findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        doneButton.setOnTouchListener(this);
     }
 
     @Override
@@ -153,6 +171,9 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
                 String mobile = orgMobile.getText().toString();
                 if (!ValidationUtil.isValidMobile(mobile)) {
                     orgMobile.setError("Invalid Mobile");
+                }
+                else if (mobileNumber.equals(mobile.replaceAll("[^\\d]", ""))) {
+                    orgMobile.setError("Cannot add self");
                 }
                 else {
                     addOrganization(mobile.replaceAll("[^\\d]", ""));
@@ -219,6 +240,10 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
             infoText.setVisibility(View.VISIBLE);
             codeContainer.setVisibility(View.VISIBLE);
+
+            activateButton.setEnabled(true);
+            activateButton.setClickable(true);
+            activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC904)) {
             DialogUtil.showOkDialog(this, "Mobile number already connected with the user.", false);
@@ -232,6 +257,18 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
         String code = activationCode.getText().toString();
 
+
+        if (code == null || code.trim().equals("")) {
+            DialogUtil.showOkDialog(this, "No activation code entered!", false);
+            return;
+        }
+
+        // after reading the activation code, clear the activation code edittext
+        activationCode.setText("");
+
+        activateButton.setEnabled(false);
+        activateButton.setClickable(false);
+        activateButton.setBackgroundResource(R.drawable.super_rounded_button_grey);
         progress2.setVisibility(View.VISIBLE);
 
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
@@ -308,11 +345,19 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
             // If the code sent has expired and new code has been sent by SMS and email.
             DialogUtil.showOkDialog(this, this.getString(R.string.new_code_sent), false);
             infoText.setText(R.string.new_code_sent);
+
+            activateButton.setEnabled(true);
+            activateButton.setClickable(true);
+            activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC08)) {
             // If the code entered was incorrect because of a typo or for whatever other reason
             DialogUtil.showOkDialog(this, this.getString(R.string.invalid_code), false);
             infoText.setText(R.string.invalid_code);
+
+            activateButton.setEnabled(true);
+            activateButton.setClickable(true);
+            activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
         }
 
     }
@@ -376,6 +421,14 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
                 i.setColorFilter(ContextCompat.getColor(v.getContext(), R.color.colorTABtextSelected));
             }
             KeyboardUtil.hideSoftKeyboard(this);
+        }
+        else if (v.getId() == R.id.doneButton) {
+            Button b = (Button) v;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                b.setBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorTABtextSelected));
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                b.setBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorMENU));
+            }
         }
         else {
             KeyboardUtil.hideSoftKeyboard(this);

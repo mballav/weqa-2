@@ -1,5 +1,6 @@
 package com.weqa.ui;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -85,18 +87,19 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
         else
             disableActivationCodeInput();
 
+        String mobileNo = i.getStringExtra("MOBILE");
+        String device = i.getStringExtra("DEVICE_NAME");
+
+        if (mobileNo != null && (!mobileNo.trim().equals(""))) {
+            mobile.setText(mobileNo);
+            deviceName.setText(device);
+        }
+
         RelativeLayout container = (RelativeLayout) findViewById(R.id.container);
         container.setOnTouchListener(this);
 
         register.setOnClickListener(this);
 
-        ImageView closeImage = (ImageView) findViewById(R.id.closeImage);
-        closeImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
     }
 
     @Override
@@ -203,8 +206,8 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
 
         if (response.getCode().equals(CodeConstants.RC13)) {
 
-            // User has been registered. No matching prior registration is found.
-            // So, the user is new. Activation has been sent by SMS and E-mail.
+            // User exists with the specified mobile number is the database.
+            // So, the new device is added to the user record. Activation has been sent by SMS and E-mail.
             // Now, the mobile user should be prompted to enter the activation code.
 
             DialogUtil.showOkDialog(this, this.getString(R.string.code_sent), false);
@@ -214,13 +217,58 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
         }
         else if (response.getCode().equals(CodeConstants.RC11)) {
             // Mobile number did not match any user records
-            DialogUtil.showOkDialog(this, "Mobile number not found.", false);
+            showMobileDoesNotExistDialog(this.getString(R.string.mobile_does_not_exist));
         }
         else if (response.getCode().equals(CodeConstants.RC12)) {
+            // PERHAPS, mobile number exists in the database but the user has not been verified.
+            // So, the user is taken to the registration page where he can enter the activation code.
             Intent i = new Intent(this, RegistrationActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(i);
         }
+    }
+
+    public void showMobileDoesNotExistDialog(String textToDisplay) {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_booking);
+
+        // set the custom dialog components - text, image and button
+        TextView text = (TextView) dialog.findViewById(R.id.bookingmessage);
+        text.setText(textToDisplay);
+
+        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
+        cancelButton.setText("Edit Details");
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                register.setEnabled(true);
+                register.setClickable(true);
+                register.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
+
+                mobile.removeTextChangedListener(textWatcher);
+                deviceName.removeTextChangedListener(textWatcher);
+            }
+        });
+
+        Button okButton = (Button) dialog.findViewById(R.id.okButton);
+        // if button is clicked, close the custom dialog
+        okButton.setText("Register?");
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ExistingUserActivity.this, RegistrationActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("MOBILE", mobile.getText().toString().replaceAll("[^\\d]", ""));
+                i.putExtra("DEVICE_NAME", deviceName.getText().toString());
+                i.putExtra("SCREEN_NAME", "ExistingUser");
+                startActivity(i);
+            }
+        });
+
+        dialog.show();
     }
 
     private void disableActivationCodeInput() {
@@ -252,6 +300,9 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
     public void sendCode() {
 
         String activationCode = code.getText().toString();
+
+        // after reading the activation code, clear the activation code edittext
+        code.setText("");
 
         progress2.setVisibility(View.VISIBLE);
         activateButton.setEnabled(false);

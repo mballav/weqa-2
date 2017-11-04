@@ -5,7 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
-    android:background="@color/colorMENU">
+    android:background="@color/colorPrimaryDark">
+
+    <Button
+        android:id="@+id/doneButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Done"
+        android:textAllCaps="false"
+        android:textAlignment="viewStart"
+        android:textSize="18sp"
+        android:textColor="@color/colorTABtext"
+        android:background="@color/colorMENU"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="15dp"
+        android:layout_alignParentTop="true"
+        />
 
     <LinearLayout
         android:id="@+id/topPanel"
@@ -13,13 +29,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_alignParentTop="true">
+        android:layout_below="@id/doneButton">
 
         <ImageView
             android:id="@+id/addOrgImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_add_circle_outline_black_24dp"
+            android:src="@drawable/ic_business_black_24dp"
             android:tint="@color/colorTABtextSelected"
             android:layout_marginTop="30dp"/>
 
@@ -135,7 +151,7 @@
                     android:id="@+id/activateButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Activate"
+                    android:text="Connect"
                     android:minHeight="0dp"
                     android:padding="5dp"
                     android:textAlignment="center"

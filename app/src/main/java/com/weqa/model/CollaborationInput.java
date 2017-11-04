@@ -11,6 +11,9 @@ public class CollaborationInput {
     @SerializedName("Uuid")
     @Expose
     private String uuid;
+    @SerializedName("OrgId")
+    @Expose
+    private Integer orgId;
 
     public String getUuid() {
         return uuid;
@@ -20,4 +23,11 @@ public class CollaborationInput {
         this.uuid = uuid;
     }
 
+    public Integer getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(Integer orgId) {
+        this.orgId = orgId;
+    }
 }

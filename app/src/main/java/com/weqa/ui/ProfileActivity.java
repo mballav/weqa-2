@@ -103,18 +103,24 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         mobileTextView.setText(mobile);
 
         Button doneButton = (Button) findViewById(R.id.doneButton);
-        doneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (screenFrom != null &&
-                        (screenFrom.equals("TeamSummary") || screenFrom.equals("Landing"))) {
-                    Intent intent = new Intent();
-                    setResult(20, intent);
+
+        if (authentication.getOrganization() == null || authentication.getOrganization().size() == 0) {
+            doneButton.setVisibility(View.GONE);
+        }
+        else {
+            doneButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (screenFrom != null &&
+                            (screenFrom.equals("TeamSummary") || screenFrom.equals("Landing"))) {
+                        Intent intent = new Intent();
+                        setResult(20, intent);
+                    }
+                    finish();
                 }
-                finish();
-            }
-        });
-        doneButton.setOnTouchListener(this);
+            });
+            doneButton.setOnTouchListener(this);
+        }
 
         TextView text0 = (TextView) findViewById(R.id.text0);
         TextView text1 = (TextView) findViewById(R.id.text1);

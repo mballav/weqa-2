@@ -65,6 +65,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
     private TeamSummaryListAdapter adapter;
 
     private SharedPreferencesUtil util;
+    private int orgId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +140,8 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         util = new SharedPreferencesUtil(this);
 
+        orgId = util.getDefaultOrganization();
+
         noteams = (TextView) findViewById(R.id.noteams);
 
         fetchTeamData();
@@ -154,6 +157,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         Log.d(LOG_TAG, "Calling the API to get collaboration data...");
         CollaborationInput input = new CollaborationInput();
         input.setUuid(InstanceIdService.getAppInstanceId(this));
+        input.setOrgId(orgId);
 
         Gson gson = new Gson();
         String json = gson.toJson(input);

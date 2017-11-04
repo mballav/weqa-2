@@ -33,6 +33,9 @@ public interface CodeConstants {
     public static final String RC11 = "RC11";
     public static final String RC12 = "RC12";
     public static final String RC13 = "RC13";
+    public static final String RC14 = "RC14";
+    public static final String RC15 = "RC15";
+    public static final String RC16 = "RC16";
 
     public static final String RC20 = "RC20";
     public static final String RC30 = "RC30";

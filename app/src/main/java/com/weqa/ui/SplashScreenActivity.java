@@ -1,8 +1,11 @@
 package com.weqa.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -49,7 +52,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
     private SharedPreferencesUtil util;
     private ProgressBar progressBar;
 
-    Thread thread = new Thread(){
+    Thread thread = new Thread() {
         @Override
         public void run() {
             try {
@@ -70,8 +73,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
         if (android.os.Build.VERSION.SDK_INT < 21) {
             Toast.makeText(this, "This application requires newer version of OS than your android phone provides!", Toast.LENGTH_LONG).show();
             thread.start();
-        }
-        else {
+        } else {
 
             util = new SharedPreferencesUtil(this);
 
@@ -81,8 +83,8 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             newUser.setVisibility(View.GONE);
             existingUser.setVisibility(View.GONE);
 
-        //TextView appslogan = (TextView) findViewById(R.id.appslogan);
-        //appslogan.setTypeface(tf);
+            //TextView appslogan = (TextView) findViewById(R.id.appslogan);
+            //appslogan.setTypeface(tf);
 
         /*
         LocationTracker tracker = new LocationTracker(this);
@@ -115,10 +117,17 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
                 }
             });
 
-        //It should show approx. 909 Km
-        //Toast.makeText(getApplicationContext(), "Distance: " + LocationUtil.getDistance(50.3, -5.1, 58.4, -3.2), Toast.LENGTH_LONG).show();
+            //It should show approx. 909 Km
+            //Toast.makeText(getApplicationContext(), "Distance: " + LocationUtil.getDistance(50.3, -5.1, 58.4, -3.2), Toast.LENGTH_LONG).show();
 
-        authenticate();
+            if (!isConnected()) {
+                Toast.makeText(this, "No internet connectivity! Please turn on your internet connection and then run the app again.", Toast.LENGTH_LONG).show();
+                thread.start();
+            }
+            else {
+                authenticate();
+            }
+
         }
     }
 
@@ -166,8 +175,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             // User has not registered and his device is new to the system
             newUser.setVisibility(View.VISIBLE);
             existingUser.setVisibility(View.VISIBLE);
-        }
-        else if (response.getAuthenticationCode().equals(CodeConstants.RC03)) {
+        } else if (response.getAuthenticationCode().equals(CodeConstants.RC03)) {
             // successful case where in registraion done, device verified, and one of the org mobile matched,
             // so the user is connected to an organization as well.
             util.addAuthTokens(response);
@@ -175,8 +183,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             Intent i = new Intent(this, LandingScreenActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(i);
-        }
-        else if (response.getAuthenticationCode().equals(CodeConstants.RC06)) {
+        } else if (response.getAuthenticationCode().equals(CodeConstants.RC06)) {
             // User is registered and the device is verified
             // But organization has provided a different number than the mobile
             // number used for registration. So, direct him to add organization
@@ -186,8 +193,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             Intent i = new Intent(this, ProfileActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(i);
-        }
-        else if (response.getAuthenticationCode().equals(CodeConstants.RC09)) {
+        } else if (response.getAuthenticationCode().equals(CodeConstants.RC09)) {
             // User has registered, but not verified his device
             Intent i = new Intent(SplashScreenActivity.this, RegistrationActivity.class);
             i.putExtra("FIRST_NAME", response.getResponseUser().getFirstName());
@@ -197,8 +203,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             i.putExtra("DEVICE_NAME", response.getResponseUser().getDeviceName());
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
-        }
-        else if (response.getAuthenticationCode().equals(CodeConstants.RC10)) {
+        } else if (response.getAuthenticationCode().equals(CodeConstants.RC10)) {
             // User is registered and the device is verified
             // But organization has provided a different number than the mobile
             // number used for registration. So, direct him to add organization
@@ -214,6 +219,16 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
 }
