@@ -23,169 +23,194 @@
         android:layout_alignParentTop="true"
         />
 
-    <LinearLayout
-        android:id="@+id/topPanel"
+<!--    <TextView
+        android:id="@+id/text0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/doneButton"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="4dp"
+        android:text="Add Organization"
+        android:textColor="@color/colorTABtext"
+        android:textSize="18sp"
+        android:textStyle="bold" />-->
+
+    <GridLayout
+        android:id="@+id/registrationForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_below="@id/doneButton">
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/doneButton"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:columnCount="1"
+        android:orientation="horizontal"
+        android:paddingRight="40dp">
 
-        <ImageView
-            android:id="@+id/addOrgImage"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_business_black_24dp"
-            android:tint="@color/colorTABtextSelected"
-            android:layout_marginTop="30dp"/>
+        <EditText
+            android:id="@+id/orgMobile"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:hint="@string/hintMobile3"
+            android:inputType="number"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/colorTABtext" />
 
-        <TextView
-            android:id="@+id/addOrgText"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Organization"
-            android:textColor="@color/colorTABtext"
-            android:layout_marginTop="10dp"
-            />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp">
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/addOrgButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/super_rounded_button_blue"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="Add New Organization"
+                android:textAllCaps="false"
+                android:textColor="@color/colorLighterGrey" />
+
+            <ProgressBar
+                android:id="@+id/progress1"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignBottom="@id/addOrgButton"
+                android:layout_alignTop="@id/addOrgButton"
+                android:layout_centerHorizontal="true"
+                android:elevation="2dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorMENU"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+    </GridLayout>
 
     <TextView
         android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/code_sent2"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/registrationForm"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:maxLines="3"
+        android:text="@string/code_sent"
         android:textAlignment="center"
         android:textColor="@color/colorLightGrey"
-        android:textSize="10sp"
-        android:textStyle="italic"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/topPanel"
-        android:layout_marginTop="20dp"
-        android:maxLines="3"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        />
+        android:textSize="12sp"
+        android:textStyle="italic" />
 
-    <LinearLayout
-        android:id="@+id/codeContainer"
+    <EditText
+        android:id="@+id/activationCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_below="@id/info"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        >
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_rectangle"
+        android:gravity="center"
+        android:hint="@string/hintActivationCode"
+        android:inputType="number"
+        android:maxLines="1"
+        android:minHeight="0dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/colorLightGrey"/>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:gravity="right|top"
-            android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/activateContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/activationCode"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp">
 
-            <EditText
-                android:id="@+id/activationCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:background="@drawable/edit_text_rectangle"
-                android:hint="Activation Code"
-                android:textStyle="italic"
-                android:minHeight="0dp"
-                android:textColor="@color/colorLightGrey"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:inputType="text"
-                android:textSize="14sp"
-                android:layout_marginRight="10dp"
-                />
+        <Button
+            android:id="@+id/activateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/super_rounded_button_blue"
+            android:minHeight="0dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:text="Activate"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorLighterGrey"
+            android:textSize="14sp" />
 
-            <RelativeLayout
-                android:layout_marginRight="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+        <ProgressBar
+            android:id="@+id/progress2"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignBottom="@id/activateButton"
+            android:layout_alignTop="@id/activateButton"
+            android:layout_centerHorizontal="true"
+            android:elevation="2dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorMENU"
+            android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/resendCode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_centerHorizontal="true"
-                    android:text="Resend Code"
-                    android:textColor="@color/colorLighterGrey"/>
+    </RelativeLayout>
 
-                <ProgressBar
-                    android:id="@+id/progress3"
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignBottom="@id/resendCode"
-                    android:layout_alignTop="@id/resendCode"
-                    android:layout_centerHorizontal="true"
-                    android:indeterminate="true"
-                    android:elevation="2dp"
-                    android:indeterminateTint="@color/colorLighterGrey"
-                    android:visibility="gone" />
+    <RelativeLayout
+        android:id="@+id/resendContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/activateContainer"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="5dp">
 
-            </RelativeLayout>
+        <TextView
+            android:id="@+id/resendCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Resend Code"
+            android:textColor="@color/colorLightGrey" />
 
-        </LinearLayout>
+        <ProgressBar
+            android:id="@+id/progress3"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignBottom="@id/resendCode"
+            android:layout_alignTop="@id/resendCode"
+            android:layout_centerHorizontal="true"
+            android:elevation="2dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorLighterGrey"
+            android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:gravity="left|top"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp">
-
-                <Button
-                    android:id="@+id/activateButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Connect"
-                    android:minHeight="0dp"
-                    android:padding="5dp"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorLighterGrey"
-                    android:textAllCaps="false"
-                    android:textSize="14sp"
-                    android:background="@drawable/super_rounded_button_darkblue"
-                    android:layout_centerVertical="true"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/progress2"
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignBottom="@id/activateButton"
-                    android:layout_alignTop="@id/activateButton"
-                    android:layout_centerHorizontal="true"
-                    android:indeterminate="true"
-                    android:elevation="2dp"
-                    android:indeterminateTint="@color/colorLighterGrey"
-                    android:visibility="gone" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/orgList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/codeContainer"
+        android:layout_below="@id/resendContainer"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="10dp"
         ></android.support.v7.widget.RecyclerView>
@@ -194,7 +219,7 @@
         android:id="@+id/progressBarContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/codeContainer"
+        android:layout_below="@id/resendContainer"
         android:layout_alignParentBottom="true"
         >
 

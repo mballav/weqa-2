@@ -21,7 +21,7 @@ public class QRCodeUtil {
 
     private static SimpleDateFormat QR_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-    private static double BUILDING_RADIUS = 500;
+    private static double BUILDING_RADIUS = 20;
 
     private SharedPreferencesUtil util;
     private Context context;
@@ -63,12 +63,12 @@ public class QRCodeUtil {
         if (!isBuildingValid(orgId, buildingId)) {
             return false;
         }
-/*        if (!inVicinityOfBuilding(buildingId)) {
+        if (!inVicinityOfBuilding(buildingId)) {
             Log.d(LOG_TAG, "---------------------------Failed the latitude longitude test!");
             return false;
         }
         Log.d(LOG_TAG, "---------------------------Passed the latitude longitude test!");
-*/
+
         return true;
     }
 
@@ -112,5 +112,10 @@ public class QRCodeUtil {
             }
         }
         return false;
+    }
+
+    public static int getOrgId(String itemQrCode) {
+        String[] tokens = itemQrCode.split(",");
+        return Integer.parseInt(tokens[1]);
     }
 }

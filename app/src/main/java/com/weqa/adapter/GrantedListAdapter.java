@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -48,12 +49,15 @@ public class GrantedListAdapter  extends RecyclerView.Adapter<GrantedListAdapter
 
     class GrantedItemHolder extends RecyclerView.ViewHolder {
 
-        private TextView name, grantDate;
+        private TextView name, grantDate, mobile;
+        private ImageView editButton;
 
         public GrantedItemHolder(View itemView) {
             super(itemView);
             name = (TextView)itemView.findViewById(R.id.name);
+            mobile = (TextView)itemView.findViewById(R.id.mobile);
             grantDate = (TextView)itemView.findViewById(R.id.grantDate);
+            editButton = (ImageView) itemView.findViewById(R.id.editButton);
         }
 
     }
@@ -81,11 +85,18 @@ public class GrantedListAdapter  extends RecyclerView.Adapter<GrantedListAdapter
     @Override
     public void onBindViewHolder(GrantedListAdapter.GrantedItemHolder holder, final int position) {
         final GrantedListItem item = this.itemData.getListData().get(position);
-        holder.name.setText(item.getFirstName() + " " + item.getLastName() + " - " + item.getMobile());
+        holder.name.setText(item.getFirstName() + " " + item.getLastName());
+        holder.mobile.setText(item.getMobile());
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
         String gDate = formatter.format(item.getEndDate());
         holder.grantDate.setText(gDate);
         holder.grantDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showUpdateDateDialog(item.getOrgUserId(), position);
+            }
+        });
+        holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showUpdateDateDialog(item.getOrgUserId(), position);
@@ -156,7 +167,7 @@ public class GrantedListAdapter  extends RecyclerView.Adapter<GrantedListAdapter
         UpdateGuestInput input = new UpdateGuestInput();
         input.setOrgUserId(orgUserId);
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String endDateString = format.format(endDate);
         endDateString += " 00:00:00.000";
         input.setEndDate(endDateString);
@@ -189,10 +200,6 @@ public class GrantedListAdapter  extends RecyclerView.Adapter<GrantedListAdapter
     private void afterUpdateGuest(int position) {
         progress1.setVisibility(View.GONE);
         dialog.dismiss();
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-        String endDateString = format.format(endDate);
-        endDateString += " 00:00:00.000";
 
         GrantedListItem item = itemData.getListData().get(position);
         item.setEndDate(endDate);

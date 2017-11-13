@@ -128,7 +128,7 @@
         android:background="@color/colorMENU"
         android:layout_alignParentBottom="true"
         />
-
+<!--
     <RelativeLayout
         android:id="@+id/chatBoxContainer"
         android:layout_width="match_parent"
@@ -161,12 +161,12 @@
                 />
         </RelativeLayout>
 
-    </RelativeLayout>
+    </RelativeLayout> -->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/chatBoxContainer"
+        android:layout_above="@id/saveButton"
         android:layout_below="@id/nextToTopPanel"
         android:background="@color/colorPrimaryDark"
         >

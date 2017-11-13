@@ -2,74 +2,86 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/container"
     android:background="@color/colorMENU">
 
     <TextView
-        android:id="@+id/text1"
+        android:id="@+id/text0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_marginStart="50dp"
         android:layout_marginTop="40dp"
-        android:text="Register with WEQA"
-        android:layout_centerHorizontal="true"
+        android:paddingLeft="4dp"
+        android:text="Existing User"
         android:textColor="@color/colorTABtext"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!--    <TextView
+            android:id="@+id/text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="50dp"
+            android:layout_below="@id/text0"
+            android:layout_marginTop="30dp"
+            android:text="Enter registered mobile"
+            android:textColor="@color/colorTABtext"
+            android:textSize="14sp"/>-->
 
     <GridLayout
         android:id="@+id/registrationForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/text0"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:columnCount="1"
         android:orientation="horizontal"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/text1"
-        android:layout_marginTop="30dp"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:columnCount="1">
+        android:paddingRight="40dp">
 
         <EditText
             android:id="@+id/mobile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorTABtext"
-            android:textStyle="italic"
-            android:textAlignment="center"
-            android:layout_gravity="fill"
-            android:hint="Mobile - 0400 xxx xxx"/>
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:hint="@string/hintMobile"
+            android:inputType="number"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/colorTABtext" />
 
         <EditText
             android:id="@+id/deviceName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorTABtext"
-            android:textStyle="italic"
-            android:textAlignment="center"
-            android:layout_gravity="fill"
-            android:hint="Name for this device"/>
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:hint="@string/hintDevice"
+            android:inputType="textCapSentences"
+            android:textAlignment="viewStart"
+            android:textColor="@color/colorTABtext" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp">
 
             <Button
                 android:id="@+id/register"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/super_rounded_button_darkblue"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
                 android:text="Register"
-                android:textColor="@color/colorLighterGrey"
                 android:textAllCaps="false"
-                android:background="@drawable/super_rounded_button_darkblue"/>
+                android:textColor="@color/colorLighterGrey" />
 
             <ProgressBar
                 android:id="@+id/progress1"
@@ -78,10 +90,10 @@
                 android:layout_height="48dp"
                 android:layout_alignBottom="@id/register"
                 android:layout_alignTop="@id/register"
-                android:indeterminate="true"
-                android:elevation="2dp"
-                android:indeterminateTint="@color/colorMENU"
                 android:layout_centerHorizontal="true"
+                android:elevation="2dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorMENU"
                 android:visibility="gone" />
 
         </RelativeLayout>
@@ -92,132 +104,116 @@
         android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/registrationForm"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:maxLines="3"
         android:text="@string/code_sent"
         android:textAlignment="center"
         android:textColor="@color/colorLightGrey"
-        android:textSize="10sp"
-        android:textStyle="italic"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/registrationForm"
-        android:layout_marginTop="40dp"
-        android:maxLines="3"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        />
+        android:textSize="12sp"
+        android:textStyle="italic" />
 
-    <LinearLayout
-        android:id="@+id/codeContainer"
+    <EditText
+        android:id="@+id/activationCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_below="@id/info"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
         android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        >
+        android:background="@drawable/edit_text_rectangle"
+        android:gravity="center"
+        android:hint="@string/hintActivationCode"
+        android:inputType="number"
+        android:maxLines="1"
+        android:minHeight="0dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/colorLightGrey"
+        android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:gravity="center|top"
-            android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/activateContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/activationCode"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
 
-            <EditText
-                android:id="@+id/activationCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:background="@drawable/edit_text_rectangle"
-                android:hint="Activation Code"
-                android:textStyle="italic"
-                android:minHeight="0dp"
-                android:textColor="@color/colorLightGrey"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:inputType="text"
-                android:textSize="14sp"
-                android:layout_centerVertical="true"
-                />
+        <Button
+            android:id="@+id/activateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/super_rounded_button_darkblue"
+            android:minHeight="0dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:text="Activate"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorLighterGrey"
+            android:textSize="14sp" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+        <ProgressBar
+            android:id="@+id/progress2"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignBottom="@id/activateButton"
+            android:layout_alignTop="@id/activateButton"
+            android:layout_centerHorizontal="true"
+            android:elevation="2dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorMENU"
+            android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/resendCode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_centerHorizontal="true"
-                    android:text="Resend Code"
-                    android:textColor="@color/colorPrimaryDark"/>
+    </RelativeLayout>
 
-                <ProgressBar
-                    android:id="@+id/progress3"
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignBottom="@id/resendCode"
-                    android:layout_alignTop="@id/resendCode"
-                    android:layout_centerHorizontal="true"
-                    android:indeterminate="true"
-                    android:elevation="2dp"
-                    android:indeterminateTint="@color/colorLighterGrey"
-                    android:visibility="gone" />
+    <RelativeLayout
+        android:id="@+id/resendContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/activateContainer"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="5dp">
 
-            </RelativeLayout>
+        <TextView
+            android:id="@+id/resendCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="Resend Code"
+            android:textColor="@color/colorLightGrey" />
 
-        </LinearLayout>
+        <ProgressBar
+            android:id="@+id/progress3"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignBottom="@id/resendCode"
+            android:layout_alignTop="@id/resendCode"
+            android:layout_centerHorizontal="true"
+            android:elevation="2dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorLighterGrey"
+            android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:gravity="center|top"
-            android:orientation="vertical">
+    </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:id="@+id/activateButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activate"
-                    android:minHeight="0dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorLighterGrey"
-                    android:textAllCaps="false"
-                    android:textSize="14sp"
-                    android:paddingLeft="50dp"
-                    android:paddingRight="50dp"
-                    android:background="@drawable/super_rounded_button_darkblue"
-                    android:layout_centerVertical="true"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/progress2"
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignBottom="@id/activateButton"
-                    android:layout_alignTop="@id/activateButton"
-                    android:layout_centerHorizontal="true"
-                    android:indeterminate="true"
-                    android:elevation="2dp"
-                    android:indeterminateTint="@color/colorMENU"
-                    android:visibility="gone" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
 
 </RelativeLayout>

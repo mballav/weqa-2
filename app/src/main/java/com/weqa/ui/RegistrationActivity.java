@@ -49,7 +49,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
     private Button register, activateButton;
     private TextView infoText, resendCode;
     private EditText code;
-    private LinearLayout codeContainer;
+    private RelativeLayout activateContainer, resendContainer;
     private ProgressBar progress1, progress2, progress3;
     private EditText firstName, lastName, email, mobile, deviceName;
 
@@ -74,12 +74,14 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
 
         infoText = (TextView) findViewById(R.id.info);
         code = (EditText) findViewById(R.id.activationCode);
-        codeContainer = (LinearLayout) findViewById(R.id.codeContainer);
+        activateContainer = (RelativeLayout) findViewById(R.id.activateContainer);
+        resendContainer = (RelativeLayout) findViewById(R.id.resendContainer);
 
         progress1 = (ProgressBar) findViewById(R.id.progress1);
         progress2 = (ProgressBar) findViewById(R.id.progress2);
         progress3 = (ProgressBar) findViewById(R.id.progress3);
 
+        disableActivationCodeInput();
         Intent i = getIntent();
 
         if (i != null) {
@@ -235,6 +237,14 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
 
     public void afterRegistration(RegistrationResponse response) {
 
+        progress1.setVisibility(View.GONE);
+
+        firstName.addTextChangedListener(textWatcher);
+        lastName.addTextChangedListener(textWatcher);
+        email.addTextChangedListener(textWatcher);
+        mobile.addTextChangedListener(textWatcher);
+        deviceName.addTextChangedListener(textWatcher);
+
         if (response.getResponseCode().equals(CodeConstants.RC16)) {
 
             // User has been registered. No matching prior registration is found, or, if prior registration
@@ -243,22 +253,42 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
             // Activation has been sent by SMS and E-mail.
             // Now, the mobile user should be prompted to enter the activation code.
 
-            progress1.setVisibility(View.GONE);
-
-            firstName.addTextChangedListener(textWatcher);
-            lastName.addTextChangedListener(textWatcher);
-            email.addTextChangedListener(textWatcher);
-            mobile.addTextChangedListener(textWatcher);
-            deviceName.addTextChangedListener(textWatcher);
-
+            showOkDialog(this.getString(R.string.code_sent));
             enableActivationCodeInput();
+            infoText.setText(R.string.code_sent);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC15)) {
-            DialogUtil.showOkDialog(this, this.getString(R.string.incorrect_mobile), false);
+            showOkDialog(this.getString(R.string.incorrect_mobile));
         }
         else if (response.getResponseCode().equals(CodeConstants.RC14)) {
             showMobileRegisteredDialog(this.getString(R.string.mobile_already_registered));
         }
+    }
+
+    public void showOkDialog(String textToDisplay) {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_booking);
+
+        // set the custom dialog components - text, image and button
+        TextView text = (TextView) dialog.findViewById(R.id.bookingmessage);
+        text.setText(textToDisplay);
+
+
+        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
+        cancelButton.setVisibility(View.GONE);
+
+        Button okButton = (Button) dialog.findViewById(R.id.okButton);
+        // if button is clicked, close the custom dialog
+        okButton.setText("Close");
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     public void showMobileRegisteredDialog(String textToDisplay) {
@@ -286,6 +316,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
                 email.removeTextChangedListener(textWatcher);
                 mobile.removeTextChangedListener(textWatcher);
                 deviceName.removeTextChangedListener(textWatcher);
+                dialog.dismiss();
             }
         });
 
@@ -295,6 +326,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 Intent i = new Intent(RegistrationActivity.this, ExistingUserActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.putExtra("MOBILE", mobile.getText().toString().replaceAll("[^\\d]", ""));
@@ -306,10 +338,19 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
         dialog.show();
     }
 
+    private void disableActivationCodeInput() {
+        infoText.setVisibility(View.GONE);
+        code.setVisibility(View.GONE);
+        activateContainer.setVisibility(View.GONE);
+        resendContainer.setVisibility(View.GONE);
+    }
+
     private void  enableActivationCodeInput() {
 
         infoText.setVisibility(View.VISIBLE);
-        codeContainer.setVisibility(View.VISIBLE);
+        code.setVisibility(View.VISIBLE);
+        activateContainer.setVisibility(View.VISIBLE);
+        resendContainer.setVisibility(View.VISIBLE);
 
         activateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -423,7 +464,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
         progress3.setVisibility(View.VISIBLE);
         resendCode.setClickable(false);
         resendCode.setEnabled(false);
-        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorLightGrey));
+        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
 
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
 
@@ -461,7 +502,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnTo
         infoText.setText(R.string.code_resent);
         resendCode.setClickable(true);
         resendCode.setEnabled(true);
-        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorLightGrey));
     }
 
     private TextWatcher textWatcher = new TextWatcher() {

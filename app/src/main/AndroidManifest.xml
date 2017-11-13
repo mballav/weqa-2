@@ -21,45 +21,47 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.SplashScreenActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="sensorPortrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.BuildingSelectionActivity" />
-        <activity android:name=".ui.FloorPlanActivity" />
-        <activity android:name=".ui.TestActivity">
-        </activity>
+        <activity android:name=".ui.BuildingSelectionActivity" android:screenOrientation="sensorPortrait" />
+        <activity android:name=".ui.FloorPlanActivity" android:screenOrientation="sensorPortrait" />
+        <activity android:name=".ui.TestActivity" android:screenOrientation="sensorPortrait"></activity>
         <activity
             android:name=".ui.LandingScreenActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="sensorPortrait" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
-        <activity android:name=".ui.ErrorHandlerActivity" />
-        <activity android:name=".ui.ProfileActivity" />
-        <activity android:name=".widget.ContinuousCaptureActivity" />
-        <activity android:name=".widget.CustomQRScannerActivity" />
-        <activity android:name=".ui.TeamSummaryActivity" />
+        <activity android:name=".ui.ErrorHandlerActivity" android:screenOrientation="sensorPortrait" />
+        <activity android:name=".ui.ProfileActivity" android:screenOrientation="sensorPortrait" />
+        <activity android:name=".widget.ContinuousCaptureActivity" android:screenOrientation="fullSensor"
+            />
+        <activity android:name=".widget.CustomQRScannerActivity" android:screenOrientation="fullSensor" />
+        <activity android:name=".ui.TeamSummaryActivity" android:screenOrientation="sensorPortrait" />
         <activity
             android:name=".ui.CreateTeamActivity"
-            android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.TeamDetailActivity" />
+            android:windowSoftInputMode="adjustPan" android:screenOrientation="sensorPortrait" />
+        <activity android:name=".ui.TeamDetailActivity" android:screenOrientation="sensorPortrait" />
         <activity
             android:name=".ui.ConnectOrgActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="sensorPortrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.RegistrationActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity android:name=".ui.GuestUserActivity">
-        </activity>
-        <activity android:name=".ui.ExistingUserActivity"></activity>
+            android:screenOrientation="sensorPortrait"
+            android:windowSoftInputMode="stateHidden"></activity>
+        <activity android:name=".ui.GuestUserActivity" android:screenOrientation="sensorPortrait"></activity>
+        <activity android:name=".ui.ExistingUserActivity" android:screenOrientation="sensorPortrait" />
+        <activity android:name=".ui.TeamMemberScanActivity" android:screenOrientation="sensorPortrait"></activity>
     </application>
 
 </manifest>

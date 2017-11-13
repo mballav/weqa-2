@@ -1,13 +1,18 @@
 package com.weqa.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v13.app.ActivityCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -71,7 +76,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
         setContentView(R.layout.activity_splash_screen);
 
         if (android.os.Build.VERSION.SDK_INT < 21) {
-            Toast.makeText(this, "This application requires newer version of OS than your android phone provides!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.os_version_old, Toast.LENGTH_LONG).show();
             thread.start();
         } else {
 
@@ -83,21 +88,6 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             newUser.setVisibility(View.GONE);
             existingUser.setVisibility(View.GONE);
 
-            //TextView appslogan = (TextView) findViewById(R.id.appslogan);
-            //appslogan.setTypeface(tf);
-
-        /*
-        LocationTracker tracker = new LocationTracker(this);
-        // check if location is available
-        if (tracker.isLocationEnabled()) {
-            double lat1 = tracker.getLatitude();
-            double lon1 = tracker.getLongitude();
-            Toast.makeText(getApplicationContext(), "Lat: " + lat1 + ", Lon: " + lon1, Toast.LENGTH_LONG).show();
-        } else {
-            // show dialog box to user to enable location
-            tracker.askToOnLocation();
-        }
-        */
             newUser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -117,17 +107,22 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
                 }
             });
 
-            //It should show approx. 909 Km
-            //Toast.makeText(getApplicationContext(), "Distance: " + LocationUtil.getDistance(50.3, -5.1, 58.4, -3.2), Toast.LENGTH_LONG).show();
+            requestPermissions();
 
-            if (!isConnected()) {
-                Toast.makeText(this, "No internet connectivity! Please turn on your internet connection and then run the app again.", Toast.LENGTH_LONG).show();
+            if (!isLocationEnabled()) {
+                Toast.makeText(this, R.string.turn_on_location, Toast.LENGTH_LONG).show();
                 thread.start();
             }
-            else {
-                authenticate();
+            else if (!areNotificationsEnabled()) {
+                Toast.makeText(this, R.string.enable_notification, Toast.LENGTH_LONG).show();
+                thread.start();
+            }
+            else if (!isConnected()) {
+                Toast.makeText(this, R.string.turn_on_internet, Toast.LENGTH_LONG).show();
+                thread.start();
             }
 
+            authenticate();
         }
     }
 
@@ -221,7 +216,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
         super.onConfigurationChanged(newConfig);
     }
 
-    public boolean isConnected() {
+    private boolean isConnected() {
         ConnectivityManager cm =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -231,4 +226,119 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
         return isConnected;
     }
 
+    private boolean areNotificationsEnabled() {
+        return NotificationManagerCompat.from(this).areNotificationsEnabled();
+    }
+
+    private boolean isLocationEnabled() {
+
+        LocationManager locationManager=(LocationManager) this.getSystemService(LOCATION_SERVICE);
+        //check for gps availability
+        boolean isGPSOn=locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //check for network availablity
+        boolean isNetWorkEnabled=locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if(!isGPSOn && !isNetWorkEnabled)
+        {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 100;
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 101;
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 102;
+
+    private void requestPermissions() {
+        requestPermissionForCamera();
+    }
+
+    private void requestPermissionForCamera() {
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_REQUEST_CAMERA);
+        }
+        else {
+            requestPermissionForLocation();
+        }
+    }
+
+    private void requestPermissionForLocation() {
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+        else {
+            requestPermissionForStorage();
+        }
+
+    }
+
+    private void requestPermissionForStorage() {
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length == 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, R.string.no_access_camera, Toast.LENGTH_LONG).show();
+                        thread.start();
+                }
+                else {
+                    requestPermissionForLocation();
+                }
+                return;
+            }
+
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length == 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, R.string.no_access_location, Toast.LENGTH_LONG).show();
+                        thread.start();
+                }
+                else {
+                    requestPermissionForStorage();
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length == 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, R.string.no_access_storage, Toast.LENGTH_LONG).show();
+                        thread.start();
+                }
+                return;
+            }
+        }
+    }
 }

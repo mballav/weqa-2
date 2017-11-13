@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -46,15 +47,17 @@ public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItem
     class OrgItemHolder extends RecyclerView.ViewHolder {
 
         private TextView orgName, privilege;
-        private Button guestAccess;
+        private TextView guestAccess;
         private ImageView defaultOrg;
+        private RelativeLayout orgContainer;
 
         public OrgItemHolder(View itemView) {
             super(itemView);
             orgName = (TextView)itemView.findViewById(R.id.orgName);
             privilege = (TextView)itemView.findViewById(R.id.privilege);
-            guestAccess = (Button) itemView.findViewById(R.id.guestButton);
+            guestAccess = (TextView) itemView.findViewById(R.id.guestText);
             defaultOrg = (ImageView) itemView.findViewById(R.id.defaultImage);
+            orgContainer = (RelativeLayout) itemView.findViewById(R.id.orgContainer);
         }
 
     }
@@ -109,18 +112,19 @@ public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItem
         else {
             holder.guestAccess.setVisibility(View.GONE);
         }
+        holder.defaultOrg.setVisibility(View.VISIBLE);
         if (item.isDefaultOrg()) {
             defaultOrgImage = holder.defaultOrg;
-            holder.defaultOrg.setVisibility(View.VISIBLE);
             holder.defaultOrg.setColorFilter(ContextCompat.getColor(c, R.color.colorGreen));
         }
         else {
             holder.defaultOrg.setColorFilter(ContextCompat.getColor(c, R.color.colorLightGrey));
         }
-        holder.defaultOrg.setOnClickListener(new View.OnClickListener() {
+        holder.orgContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageView i = (ImageView) view;
+                RelativeLayout orgC = (RelativeLayout) view;
+                ImageView i = orgC.findViewById(R.id.defaultImage);
                 if (defaultOrgImage != i) {
                     i.setColorFilter(ContextCompat.getColor(c, R.color.colorGreen));
                     if (defaultOrgImage != null) {

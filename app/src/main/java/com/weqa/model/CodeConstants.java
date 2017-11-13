@@ -47,6 +47,7 @@ public interface CodeConstants {
     public static final String RC501 = "RC501";
     public static final String RC601 = "RC601";
     public static final String RC701 = "RC701";
+    public static final String RC702 = "RC702";
     public static final String RC801 = "RC801";
 
     public static final String RC901 = "RC901";

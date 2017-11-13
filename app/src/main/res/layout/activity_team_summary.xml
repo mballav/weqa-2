@@ -62,7 +62,7 @@
                                     style="@style/Widget.AppCompat.Light.DropDownItem.Spinner"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:entries="@array/planets"
+                                    android:entries="@array/dummyarray"
                                     android:background="@null"
                                     android:layout_alignParentStart="true"
                                     android:layout_alignParentEnd="true"
@@ -164,7 +164,7 @@
             android:id="@+id/menu1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.2"
+            android:layout_weight="0.33"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -184,36 +184,11 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/menu2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_format_list_checks"
-                android:tint="@color/colorTABtext" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Activity"
-                android:textAppearance="@style/smallgreytext" />
-
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/menu3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="0.2"
+            android:layout_weight="0.34"
             android:gravity="center_vertical|center_horizontal"
             android:orientation="vertical">
 
@@ -230,7 +205,7 @@
             android:id="@+id/menu4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.2"
+            android:layout_weight="0.33"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -246,29 +221,6 @@
                 android:layout_height="wrap_content"
                 android:text="Team"
                 android:textAppearance="@style/smallgreytextselected" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/menu5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_more_horiz_black_24dp"
-                android:tint="@color/colorTABtext" />
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="More"
-                android:textAppearance="@style/smallgreytext" />
 
         </LinearLayout>
 

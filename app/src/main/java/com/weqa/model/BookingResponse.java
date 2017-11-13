@@ -11,9 +11,9 @@ public class BookingResponse {
     @SerializedName("actionCode")
     @Expose
     private String actionCode;
-    @SerializedName("qtCode")
+    @SerializedName("previousQrCode")
     @Expose
-    private String qtCode;
+    private String previoudQrCode;
     @SerializedName("releaseStatus")
     @Expose
     private Boolean releaseStatus;
@@ -24,20 +24,20 @@ public class BookingResponse {
     @Expose
     private Boolean maxReached;
 
+    public String getPrevioudQrCode() {
+        return previoudQrCode;
+    }
+
+    public void setPrevioudQrCode(String previoudQrCode) {
+        this.previoudQrCode = previoudQrCode;
+    }
+
     public String getActionCode() {
         return actionCode;
     }
 
     public void setActionCode(String actionCode) {
         this.actionCode = actionCode;
-    }
-
-    public String getQtCode() {
-        return qtCode;
-    }
-
-    public void setQtCode(String qtCode) {
-        this.qtCode = qtCode;
     }
 
     public Boolean getReleaseStatus() {

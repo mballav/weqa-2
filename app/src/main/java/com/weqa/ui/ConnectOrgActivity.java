@@ -55,12 +55,11 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
     private static final String LOG_TAG = "WEQA-LOG";
 
     private RecyclerView orgList;
-    private ImageView addOrgImage;
     private TextView infoText, resendCode;
-    private Button addOrgButton, activateButton;
+    private Button addOrgButton, activateButton, connectButton;
     private EditText orgMobile, activationCode;
     private RelativeLayout addOrgContainer;
-    private LinearLayout codeContainer;
+    private RelativeLayout activateContainer, resendContainer;
     private ProgressBar progress1, progress2, progress3;
     private Dialog dialog;
 
@@ -96,12 +95,15 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
         progressBarContainer = (RelativeLayout) findViewById(R.id.progressBarContainer);
         progressBarContainer.setVisibility(View.GONE);
 
-        addOrgImage = (ImageView) findViewById(R.id.addOrgImage);
-
         infoText = (TextView) findViewById(R.id.info);
+
+        infoText.setText(R.string.code_sent2);
 
         resendCode = (TextView) findViewById(R.id.resendCode);
         activateButton = (Button) findViewById(R.id.activateButton);
+        connectButton = (Button) findViewById(R.id.addOrgButton);
+
+        orgMobile = (EditText) findViewById(R.id.orgMobile);
 
         activateButton.setOnClickListener(this);
         resendCode.setOnClickListener(this);
@@ -109,12 +111,12 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
         activationCode = (EditText) findViewById(R.id.activationCode);
         activationCode.clearFocus();
 
-        codeContainer = (LinearLayout) findViewById(R.id.codeContainer);
+        activateContainer = (RelativeLayout) findViewById(R.id.activateContainer);
+        resendContainer = (RelativeLayout) findViewById(R.id.resendContainer);
 
+        progress1 = (ProgressBar) findViewById(R.id.progress1);
         progress2 = (ProgressBar) findViewById(R.id.progress2);
         progress3 = (ProgressBar) findViewById(R.id.progress3);
-
-        addOrgImage.setOnClickListener(this);
 
         RelativeLayout container = (RelativeLayout) findViewById(R.id.container);
         container.setOnTouchListener(this);
@@ -129,14 +131,27 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
             }
         });
         doneButton.setOnTouchListener(this);
+
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String mobile = orgMobile.getText().toString();
+                if (!ValidationUtil.isValidMobile(mobile)) {
+                    orgMobile.setError("Invalid Mobile");
+                }
+                else if (mobileNumber.equals(mobile.replaceAll("[^\\d]", ""))) {
+                    orgMobile.setError("Cannot add self");
+                }
+                else {
+                    addOrganization(mobile.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.addOrgImage) {
-            showAddOrganizationDialog();
-        }
-        else if (view.getId() == R.id.activateButton) {
+        if (view.getId() == R.id.activateButton) {
             sendCode();
         }
         else if (view.getId() == R.id.resendCode) {
@@ -154,38 +169,11 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
         orgList.setVisibility(View.VISIBLE);
     }
 
-    private void showAddOrganizationDialog() {
-        dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        dialog.setContentView(R.layout.dialog_add_organization);
-
-        orgMobile = (EditText) dialog.findViewById(R.id.orgMobile);
-
-        Button connectButton = (Button) dialog.findViewById(R.id.addOrgButton);
-        progress1 = (ProgressBar) dialog.findViewById(R.id.progress1);
-
-        connectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String mobile = orgMobile.getText().toString();
-                if (!ValidationUtil.isValidMobile(mobile)) {
-                    orgMobile.setError("Invalid Mobile");
-                }
-                else if (mobileNumber.equals(mobile.replaceAll("[^\\d]", ""))) {
-                    orgMobile.setError("Cannot add self");
-                }
-                else {
-                    addOrganization(mobile.replaceAll("[^\\d]", ""));
-                }
-            }
-        });
-
-        dialog.show();
-    }
-
     private void addOrganization(String mobile) {
 
+        orgMobileNo = mobile;
+
+        orgMobile.setText("");
         progress1.setVisibility(View.VISIBLE);
 
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
@@ -225,12 +213,10 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
     public void afterAddOrg(AddOrganizationResponse response) {
 
-        orgMobileNo = orgMobile.getText().toString().replaceAll("[^\\d]", "");
-
-        dialog.dismiss();
+        progress1.setVisibility(View.GONE);
 
         if (response.getResponseCode().equals(CodeConstants.RC901)) {
-            DialogUtil.showOkDialog(this, "Mobile number not found for any organization.", false);
+            DialogUtil.showOkDialog(this, this.getString(R.string.mobile_not_found_for_org), false);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC903)) {
 
@@ -239,17 +225,19 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
             infoText.setText(R.string.code_sent);
 
             infoText.setVisibility(View.VISIBLE);
-            codeContainer.setVisibility(View.VISIBLE);
+            activationCode.setVisibility(View.VISIBLE);
+            activateContainer.setVisibility(View.VISIBLE);
+            resendContainer.setVisibility(View.VISIBLE);
 
             activateButton.setEnabled(true);
             activateButton.setClickable(true);
-            activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
+            activateButton.setBackgroundResource(R.drawable.super_rounded_button_blue);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC904)) {
-            DialogUtil.showOkDialog(this, "Mobile number already connected with the user.", false);
+            DialogUtil.showOkDialog(this, this.getString(R.string.mobile_already_connected), false);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC906)) {
-            DialogUtil.showOkDialog(this, "Another user is connected with the mobile number provided.", false);
+            DialogUtil.showOkDialog(this, this.getString(R.string.mobile_connected_to_user), false);
         }
     }
 
@@ -259,7 +247,7 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
 
         if (code == null || code.trim().equals("")) {
-            DialogUtil.showOkDialog(this, "No activation code entered!", false);
+            DialogUtil.showOkDialog(this, this.getString(R.string.no_activation_code), false);
             return;
         }
 
@@ -268,7 +256,7 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
         activateButton.setEnabled(false);
         activateButton.setClickable(false);
-        activateButton.setBackgroundResource(R.drawable.super_rounded_button_grey);
+        activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkgrey);
         progress2.setVisibility(View.VISIBLE);
 
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
@@ -338,8 +326,6 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
             orgListData.addItem(item);
             orgListAdapter.notifyDataSetChanged();
 
-            infoText.setVisibility(View.GONE);
-            codeContainer.setVisibility(View.GONE);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC07)) {
             // If the code sent has expired and new code has been sent by SMS and email.
@@ -348,7 +334,7 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
             activateButton.setEnabled(true);
             activateButton.setClickable(true);
-            activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
+            activateButton.setBackgroundResource(R.drawable.super_rounded_button_blue);
         }
         else if (response.getResponseCode().equals(CodeConstants.RC08)) {
             // If the code entered was incorrect because of a typo or for whatever other reason
@@ -357,7 +343,7 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
 
             activateButton.setEnabled(true);
             activateButton.setClickable(true);
-            activateButton.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
+            activateButton.setBackgroundResource(R.drawable.super_rounded_button_blue);
         }
 
     }
@@ -408,17 +394,7 @@ public class ConnectOrgActivity extends AppCompatActivity implements View.OnClic
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 b.setBackgroundResource(R.drawable.super_rounded_button_yellow);
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                b.setBackgroundResource(R.drawable.super_rounded_button_darkblue);
-            }
-            KeyboardUtil.hideSoftKeyboard(this);
-        }
-        else if (v.getId() == R.id.addOrgImage) {
-            ImageView i = (ImageView) v;
-
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                i.setColorFilter(ContextCompat.getColor(v.getContext(), R.color.colorTABtext));
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                i.setColorFilter(ContextCompat.getColor(v.getContext(), R.color.colorTABtextSelected));
+                b.setBackgroundResource(R.drawable.super_rounded_button_blue);
             }
             KeyboardUtil.hideSoftKeyboard(this);
         }

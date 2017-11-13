@@ -1,6 +1,7 @@
 package com.weqa.ui;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,7 +52,7 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
     private Button register, activateButton;
     private TextView infoText, resendCode;
     private EditText code;
-    private LinearLayout codeContainer;
+    private RelativeLayout activateContainer, resendContainer;
     private ProgressBar progress1, progress2, progress3;
     private EditText mobile, deviceName;
 
@@ -72,7 +74,8 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
 
         infoText = (TextView) findViewById(R.id.info);
         code = (EditText) findViewById(R.id.activationCode);
-        codeContainer = (LinearLayout) findViewById(R.id.codeContainer);
+        activateContainer = (RelativeLayout) findViewById(R.id.activateContainer);
+        resendContainer = (RelativeLayout) findViewById(R.id.resendContainer);
 
         progress1 = (ProgressBar) findViewById(R.id.progress1);
         progress2 = (ProgressBar) findViewById(R.id.progress2);
@@ -100,6 +103,9 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
 
         register.setOnClickListener(this);
 
+        mobile.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mobile, InputMethodManager.SHOW_IMPLICIT);
     }
 
     @Override
@@ -250,6 +256,7 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
 
                 mobile.removeTextChangedListener(textWatcher);
                 deviceName.removeTextChangedListener(textWatcher);
+                dialog.dismiss();
             }
         });
 
@@ -259,6 +266,7 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 Intent i = new Intent(ExistingUserActivity.this, RegistrationActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.putExtra("MOBILE", mobile.getText().toString().replaceAll("[^\\d]", ""));
@@ -273,13 +281,17 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
 
     private void disableActivationCodeInput() {
         infoText.setVisibility(View.GONE);
-        codeContainer.setVisibility(View.GONE);
+        code.setVisibility(View.GONE);
+        activateContainer.setVisibility(View.GONE);
+        resendContainer.setVisibility(View.GONE);
     }
 
     private void  enableActivationCodeInput() {
 
         infoText.setVisibility(View.VISIBLE);
-        codeContainer.setVisibility(View.VISIBLE);
+        code.setVisibility(View.VISIBLE);
+        activateContainer.setVisibility(View.VISIBLE);
+        resendContainer.setVisibility(View.VISIBLE);
 
         activateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -392,7 +404,7 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
         progress3.setVisibility(View.VISIBLE);
         resendCode.setClickable(false);
         resendCode.setEnabled(false);
-        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorLightGrey));
+        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
 
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
 
@@ -430,7 +442,7 @@ public class ExistingUserActivity extends AppCompatActivity  implements View.OnT
         infoText.setText(R.string.code_resent);
         resendCode.setClickable(true);
         resendCode.setEnabled(true);
-        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        resendCode.setTextColor(ContextCompat.getColor(this, R.color.colorLightGrey));
     }
 
     private TextWatcher textWatcher = new TextWatcher() {

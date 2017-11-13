@@ -6,7 +6,9 @@ import com.weqa.model.AuthResponse;
 import com.weqa.model.Availability;
 import com.weqa.model.AvailabilityInput;
 import com.weqa.model.BookingInput;
+import com.weqa.model.BookingInputV2;
 import com.weqa.model.BookingReleaseInput;
+import com.weqa.model.BookingReleaseInputV2;
 import com.weqa.model.BookingResponse;
 import com.weqa.model.CollaborationInput;
 import com.weqa.model.CollaborationResponse;
@@ -124,4 +126,10 @@ public interface RetrofitService {
 
     @POST("api/security/BookRelease")
     MyCall<BookingResponse> bookRelease(@Body BookingReleaseInput input);
+
+    @POST("api/security/BookReleaseV2")
+    MyCall<BookingResponse> bookV2(@Body BookingInputV2 input);
+
+    @POST("api/security/BookReleaseV2")
+    MyCall<BookingResponse> bookReleaseV2(@Body BookingReleaseInputV2 input);
 }

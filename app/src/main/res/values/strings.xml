@@ -1,30 +1,68 @@
 <resources>
+
     <string name="app_name">WEQA</string>
-    <string name="no_selection">No results</string>
+
+    <!-- Common -->
+    <string name="cancelled">Cancelled</string> <!-- This is displayed when a user cancels the QR Code scan -->
+    <string name="under_dev">Under Development</string> <!-- This is displayed when unimplemented menu option is clicked -->
+    <string name="no_selection">No Results</string> <!-- When building dropdown is searched and no results are found -->
+
+    <!-- CreateTeamActivity -->
+    <string name="team_not_blank">Team name cannot be blank</string>
+    <string name="team_created">Team created</string>
+
+    <!-- LandingScreenActivity -->
+    <string name="fatal_error">Fatal Error... exiting!</string> <!-- This would not be displayed normally at all, but if API fails to return
+                                                                     an image or there is problem reading image file from the storage, this
+                                                                     will be displayed -->
+
+    <!-- SplashScreenActivity -->
+    <string name="os_version_old">This application requires newer version of OS than your android phone provides</string>
+    <string name="turn_on_location">Please turn on location service on this mobile and then run the app again</string>
+    <string name="enable_notification">Please enable notifications for this app and then run the app again</string>
+    <string name="turn_on_internet">No internet connectivity. Please turn on your internet connection and then run the app again</string>
+    <string name="no_access_camera">This app requires access to Camera. Please restart the app and grant access</string>
+    <string name="no_access_location">This app requires access to location. Please restart the app and grant access</string>
+    <string name="no_access_storage">This app requires access to external storage. Please restart the app and grant access</string>
+
+    <!-- TeamDetailActivity -->
+    <string name="only_creator">Only creator can delete team</string>
+    <string name="team_members_added">Team information saved</string>
+    <string name="team_deleted">Team deleted</string>
+    <string name="fatal_error2">Fatal Error... exiting!</string> <!-- This would not be displayed normally at all, but if API fails to return
+                                                                     details of a team, then this message would be displayed -->
+
+    <!-- RegistrationActivity -->
+    <string name="incorrect_mobile">Something went wrong! Can you please check the mobile number again?</string>
+    <string name="mobile_already_registered">Mobile number entered is registered with another user.</string>
     <string name="code_sent">Activation code has been sent to your mobile and email-address. Please enter the code to complete registration.</string>
     <string name="new_code_sent">Entered code has expired. New activation code has been sent to your mobile and email-address. Please enter the new code to complete registration.</string>
     <string name="invalid_code">Entered code was invalid. Please enter valid code or click on "Resend Code"</string>
     <string name="code_resent">Activation code has been re-sent to your mobile and email-address. Please enter the code to complete registration.</string>
-    <string name="code_sent2">If you received an activation code to connect to an Organization, please enter it here.</string>
 
-    <string name="add_org_msg1">Another user is connected with the mobile number provided</string>
-    <string name="add_org_msg2">Mobile number not found for any organisation</string>
-    <string name="activate_org_msg">Organisation connected successfully</string>
-
-    <string name="incorrect_mobile">Something went wrong! Can you please check the mobile number again?</string>
-    <string name="mobile_already_registered">Mobile number entered is registered with another user.</string>
-
+    <!-- ExistingUserActivity -->
     <string name="mobile_does_not_exist">Mobile number does not exist.</string>
 
-    <string-array name="planets">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
-        <item>Pluto</item>
+    <!-- ConnectOrgActivity -->
+    <string name="code_sent2">If you received an activation code to connect to an Organization, please enter it here.</string>
+    <string name="mobile_not_found_for_org">Mobile number not found for any organization</string>
+    <string name="mobile_already_connected">Mobile number already connected with the user</string>
+    <string name="mobile_connected_to_user">Another user is connected with the mobile number provided</string>
+    <string name="no_activation_code">No activation code entered</string>
+
+    <!-- Input Box hint texts -->
+    <string name="hintMobile"><i>Registered Mobile - 614 xxxx xxxx</i></string>
+    <string name="hintDevice"><i>Name for this device</i></string>
+    <string name="hintActivationCode"><i>Activation Code</i></string>
+
+    <string name="hintMobile2"><i>Mobile - 614 xxxx xxxx</i></string>
+    <string name="hintMobile3"><i>Organization Provided Mobile</i></string>
+    <string name="hintFN"><i>First Name</i></string>
+    <string name="hintLN"><i>Last Name</i></string>
+    <string name="hintEmail"><i>Email ID</i></string>
+
+    <string-array name="dummyarray">
+        <item>Item1</item>
+        <item>Item2</item>
     </string-array>
 </resources>

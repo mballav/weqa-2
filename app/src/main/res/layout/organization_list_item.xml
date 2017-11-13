@@ -10,7 +10,7 @@
     android:layout_marginTop="2dp"
     android:layout_marginLeft="0dp"
     android:layout_marginRight="0dp"
-    android:background="@drawable/avail_list_rectangle"
+    android:background="@drawable/avail_list_rectangle3"
     >
 
     <TextView
@@ -38,21 +38,17 @@
         android:textColor="@color/colorDarkGrey"
         />
 
-    <Button
-        android:id="@+id/guestButton"
+    <TextView
+        android:id="@+id/guestText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginStart="20dp"
         android:layout_below="@id/privilege"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
         android:layout_marginTop="7dp"
-        android:text="Guest Access"
-        android:textColor="@color/colorTABtext"
-        android:background="@color/colorMENU"/>
+        android:text="Manage Guests"
+        android:textColor="@color/colorMENU"
+        />
 
     <ImageView
         android:id="@+id/defaultImage"

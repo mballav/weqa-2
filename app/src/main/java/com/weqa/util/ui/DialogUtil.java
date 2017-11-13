@@ -72,18 +72,17 @@ public class DialogUtil {
     public static class Timer2 {
 
         private Dialog dialog;
-        private boolean refreshHotspots, removeLocalBooking;
+        private boolean refreshHotspots;
         private LandingScreenActivity activity;
         private String qrCodeBooked, qrCodeNew;
         private String bookingTime;
         public boolean buttonPressed = false;
         private TextView countdown;
 
-        public Timer2(Dialog dialog, boolean refreshHotspots, boolean removeLocalBooking, LandingScreenActivity activity,
+        public Timer2(Dialog dialog, boolean refreshHotspots, LandingScreenActivity activity,
                       String qrCodeBooked, String qrCodeNew, String bookingTime) {
             this.dialog = dialog;
             this.refreshHotspots = refreshHotspots;
-            this.removeLocalBooking = removeLocalBooking;
             this.activity = activity;
             this.qrCodeBooked = qrCodeBooked;
             this.qrCodeNew = qrCodeNew;
@@ -118,8 +117,8 @@ public class DialogUtil {
                     });
                     if (!buttonPressed) {
                         SharedPreferencesUtil util = new SharedPreferencesUtil(activity);
-                        util.addBooking(qrCodeNew, bookingTime);
-                        activity.releaseQRCodeItem(qrCodeBooked, false, removeLocalBooking);
+                        util.appendBooking(qrCodeNew, bookingTime);
+                        activity.releaseQRCodeItem(qrCodeBooked, false);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -176,17 +175,15 @@ public class DialogUtil {
     public static class Timer4 {
 
         private Dialog dialog;
-        private boolean removeLocalBooking;
         private TeamSummaryActivity activity;
         private String qrCodeBooked, qrCodeNew;
         private String bookingTime;
         public boolean buttonPressed = false;
         private TextView countdown;
 
-        public Timer4(Dialog dialog, boolean removeLocalBooking, TeamSummaryActivity activity,
+        public Timer4(Dialog dialog, TeamSummaryActivity activity,
                       String qrCodeBooked, String qrCodeNew, String bookingTime) {
             this.dialog = dialog;
-            this.removeLocalBooking = removeLocalBooking;
             this.activity = activity;
             this.qrCodeBooked = qrCodeBooked;
             this.qrCodeNew = qrCodeNew;
@@ -221,8 +218,8 @@ public class DialogUtil {
                     });
                     if (!buttonPressed) {
                         SharedPreferencesUtil util = new SharedPreferencesUtil(activity);
-                        util.addBooking(qrCodeNew, bookingTime);
-                        activity.releaseQRCodeItem(qrCodeBooked, false, removeLocalBooking);
+                        util.appendBooking(qrCodeNew, bookingTime);
+                        activity.releaseQRCodeItem(qrCodeBooked, false);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -315,7 +312,7 @@ public class DialogUtil {
             public void onClick(View v) {
                 timer.buttonPressed = true;
                 dialog.dismiss();
-                activity.releaseQRCodeItem(qrCode, true, true);
+                activity.releaseQRCodeItem(qrCode, true);
             }
         });
         cancelButton.setText("Release");
@@ -328,97 +325,6 @@ public class DialogUtil {
             public void onClick(View v) {
                 timer.buttonPressed = true;
                 dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
-
-    public static void showOkDialogWithCancelForSecondBooking(final LandingScreenActivity activity, String textToDisplay,
-                                                              final String qrCodeOld, final String qrCodeNew,
-                                                              final String bookingTime, final boolean refreshHotspots) {
-        final Dialog dialog = new Dialog(activity);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_booking_timer);
-
-        // set the custom dialog components - text, image and button
-        TextView text = (TextView) dialog.findViewById(R.id.bookingmessage);
-        text.setText(textToDisplay);
-
-
-        // start the timer
-        final DialogUtil.Timer2 timer2 = new DialogUtil.Timer2(dialog, refreshHotspots, false, activity, qrCodeOld, qrCodeNew, bookingTime);
-
-        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
-        cancelButton.setText("Release");
-        // if button is clicked, close the custom dialog
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timer2.buttonPressed = true;
-                dialog.dismiss();
-                activity.releaseQRCodeItem(qrCodeNew, false, false);
-            }
-        });
-
-        Button okButton = (Button) dialog.findViewById(R.id.okButton);
-        okButton.setText("Close");
-        // if button is clicked, close the custom dialog
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timer2.buttonPressed = true;
-                dialog.dismiss();
-                SharedPreferencesUtil util = new SharedPreferencesUtil(activity);
-                util.addBooking(qrCodeNew, bookingTime);
-                activity.releaseQRCodeItem(qrCodeOld, false, false);
-                if (refreshHotspots) {
-                    activity.updateFloorplanAvailability();
-                }
-            }
-        });
-
-        dialog.show();
-    }
-
-    public static void showOkDialogWithCancelForSecondBooking(final TeamSummaryActivity activity, String textToDisplay,
-                                                              final String qrCodeOld, final String qrCodeNew,
-                                                              final String bookingTime) {
-        final Dialog dialog = new Dialog(activity);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_booking_timer);
-
-        // set the custom dialog components - text, image and button
-        TextView text = (TextView) dialog.findViewById(R.id.bookingmessage);
-        text.setText(textToDisplay);
-
-
-        // start the timer
-        final DialogUtil.Timer4 timer4 = new DialogUtil.Timer4(dialog, false, activity, qrCodeOld, qrCodeNew, bookingTime);
-
-        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
-        cancelButton.setText("Release");
-        // if button is clicked, close the custom dialog
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timer4.buttonPressed = true;
-                dialog.dismiss();
-                activity.releaseQRCodeItem(qrCodeNew, false, false);
-            }
-        });
-
-        Button okButton = (Button) dialog.findViewById(R.id.okButton);
-        okButton.setText("Close");
-        // if button is clicked, close the custom dialog
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timer4.buttonPressed = true;
-                dialog.dismiss();
-                SharedPreferencesUtil util = new SharedPreferencesUtil(activity);
-                util.addBooking(qrCodeNew, bookingTime);
-                activity.releaseQRCodeItem(qrCodeOld, false, false);
             }
         });
 
@@ -539,7 +445,7 @@ public class DialogUtil {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                activity.releaseQRCodeItem(qrCode, true, true, refreshHotspots);
+                activity.releaseQRCodeItem(qrCode, true, refreshHotspots);
             }
         });
 
@@ -584,7 +490,7 @@ public class DialogUtil {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                activity.releaseQRCodeItem(qrCode, true, true);
+                activity.releaseQRCodeItem(qrCode, true);
             }
         });
 

@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
@@ -41,7 +40,9 @@ import com.weqa.framework.MyCall;
 import com.weqa.model.Authentication;
 import com.weqa.model.Authorization;
 import com.weqa.model.BookingInput;
+import com.weqa.model.BookingInputV2;
 import com.weqa.model.BookingReleaseInput;
+import com.weqa.model.BookingReleaseInputV2;
 import com.weqa.model.BookingResponse;
 import com.weqa.model.CodeConstants;
 import com.weqa.model.FloorPlan;
@@ -109,6 +110,7 @@ public class LandingScreenActivity extends AppCompatActivity
     private long selectedBuildingId;
     private long selectedFloorplanId;
     private int defaultOrgId;
+    private int privilegeId;
 
     private List<Authorization> compiledAuthList;
 
@@ -171,9 +173,18 @@ public class LandingScreenActivity extends AppCompatActivity
         spinner.setTitle("Buildings");
 
         util = new SharedPreferencesUtil(this);
+
         authListOriginal = util.getAuthorizationInfo();
         defaultOrgId = util.getDefaultOrganization();
         Log.d(LOG_TAG, "Default Org ID from user preferences is " + defaultOrgId);
+
+        // Find the privilege id for the default org
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == defaultOrgId) {
+                privilegeId = o.getPrivilegeId();
+                break;
+            }
+        }
 
         compiledAuthList = AuthorizationUtil.filterBuildings(authListOriginal, defaultOrgId);
 
@@ -200,22 +211,16 @@ public class LandingScreenActivity extends AppCompatActivity
         profilePicture.setOnClickListener(this);
 
         LinearLayout menu1 = (LinearLayout) findViewById(R.id.menu1);
-        LinearLayout menu2 = (LinearLayout) findViewById(R.id.menu2);
         LinearLayout menu3 = (LinearLayout) findViewById(R.id.menu3);
         LinearLayout menu4 = (LinearLayout) findViewById(R.id.menu4);
-        LinearLayout menu5 = (LinearLayout) findViewById(R.id.menu5);
 
         menu1.setOnClickListener(this);
-        menu2.setOnClickListener(this);
         menu3.setOnClickListener(this);
         menu4.setOnClickListener(this);
-        menu5.setOnClickListener(this);
 
         menu1.setOnTouchListener(this);
-        menu2.setOnTouchListener(this);
         menu3.setOnTouchListener(this);
         menu4.setOnTouchListener(this);
-        menu5.setOnTouchListener(this);
 
         TextView homeText = (TextView) findViewById(R.id.textView1);
         homeText.setTextColor(ContextCompat.getColor(this, R.color.colorTABtextSelected));
@@ -288,7 +293,7 @@ public class LandingScreenActivity extends AppCompatActivity
             this.startActivity(i);
         }
         else if (v.getId() != R.id.menu1){
-            Toast.makeText(v.getContext(), "Under Development", Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(), R.string.under_dev, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -330,7 +335,7 @@ public class LandingScreenActivity extends AppCompatActivity
                 if (tabLayoutWidth < deviceWidth) {
                     mTabLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
                     mTabLayout.setTabMode(TabLayout.MODE_FIXED);
-                    mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+                    mTabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
                 } else {
                     mTabLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
                     mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
@@ -338,7 +343,6 @@ public class LandingScreenActivity extends AppCompatActivity
                 mTabLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
-
     }
 
     public void updateUI() {
@@ -570,7 +574,7 @@ public class LandingScreenActivity extends AppCompatActivity
             progressBarContainer.setVisibility(View.GONE);
 
         } else {
-            Toast.makeText(this, "Fatal Error... exiting!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.fatal_error, Toast.LENGTH_LONG).show();
             this.finish();
         }
     }
@@ -585,13 +589,14 @@ public class LandingScreenActivity extends AppCompatActivity
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null) {
                 if (result.getContents() == null) {
-                    Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
-/*                if (qrCodeUtil.isQRCodeValid(TEST_QR_CODE)) {
-                    bookQRCodeItem(TEST_QR_CODE);
-                }
-                else {
-                    DialogUtil.showOkDialog(this, "Invalid QR Code! Code: " + TEST_QR_CODE, false, false);
-                } */
+                    Toast.makeText(this, R.string.cancelled, Toast.LENGTH_LONG).show();
+/*                  QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
+                    if (qrCodeUtil.isQRCodeValid(TEST_QR_CODE)) {
+                        bookQRCodeItem(TEST_QR_CODE);
+                    }
+                    else {
+                        DialogUtil.showOkDialog(this, "Invalid QR Code! Code: " + TEST_QR_CODE, false, false);
+                    } */
                 } else {
                     String qrCode = result.getContents();
                     QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
@@ -612,18 +617,31 @@ public class LandingScreenActivity extends AppCompatActivity
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
         RetrofitService service = retrofit.create(RetrofitService.class);
 
-        String qrCodeBooked = util.getBookingQRCode();
+        //List<String> qrCodeBookedList = util.getBookingQRCodeList();
+
+        int orgId = QRCodeUtil.getOrgId(qrCode);
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == orgId) {
+                privilegeId = o.getPrivilegeId();
+            }
+        }
+
         // Case of new booking or Re-Booking
-        if (qrCodeBooked == null || qrCodeBooked.equals(qrCode)) {
+        //if (qrCodeBookedList.size() == 0 || (qrCodeBookedList.indexOf(qrCode) != -1)) {
 
             Log.d(LOG_TAG, "Calling the API to book...");
 
-            BookingInput input = new BookingInput(InstanceIdService.getAppInstanceId(this), qrCode);
+            BookingInputV2 input = new BookingInputV2();
+            input.setUuid(InstanceIdService.getAppInstanceId(this));
+            input.setQrCode(qrCode);
+            input.setOrgId(orgId);
+            input.setPrivilegeId(privilegeId);
+
             Gson gson = new Gson();
             String json = gson.toJson(input); // myObject - instance of MyObject
             Log.d(LOG_TAG, "INPUT: " + json);
 
-            MyCall<BookingResponse> call = service.book(input);
+            MyCall<BookingResponse> call = service.bookV2(input);
 
             CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
                 @Override
@@ -635,7 +653,7 @@ public class LandingScreenActivity extends AppCompatActivity
                     LandingScreenActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            showBookingResponse(response.body(), qrCode);
+                            showBookingReleaseResponse(response.body(), qrCode, true, false);
                         }
                     });
                 }
@@ -643,10 +661,15 @@ public class LandingScreenActivity extends AppCompatActivity
 
             call.enqueue(customCallback);
             Log.d(LOG_TAG, "Waiting for response...");
-        }
-        // Case of double booking
-        else if (!qrCodeBooked.equals(qrCode)) {
-            BookingReleaseInput input = new BookingReleaseInput(CodeConstants.AC601, InstanceIdService.getAppInstanceId(this), qrCode);
+/*        }
+        // Case of multiple booking
+        else if (qrCodeBookedList.indexOf(qrCode) == -1) {
+            BookingReleaseInputV2 input = new BookingReleaseInputV2();
+            input.setActionCode(CodeConstants.AC601);
+            input.setUuid(InstanceIdService.getAppInstanceId(this));
+            input.setQrCode(qrCode);
+            input.setOrgId(orgId);
+            input.setPrivilegeId(privilegeId);
 
             Log.d(LOG_TAG, "Calling the API to release...");
 
@@ -654,7 +677,7 @@ public class LandingScreenActivity extends AppCompatActivity
             String json = gson.toJson(input); // myObject - instance of MyObject
             Log.d(LOG_TAG, "INPUT: " + json);
 
-            MyCall<BookingResponse> call = service.bookRelease(input);
+            MyCall<BookingResponse> call = service.bookReleaseV2(input);
 
             CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
                 @Override
@@ -666,7 +689,7 @@ public class LandingScreenActivity extends AppCompatActivity
                     LandingScreenActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            showBookingReleaseResponse(response.body(), qrCode, true, false, false);
+                            showBookingReleaseResponse(response.body(), qrCode, true, false);
                         }
                     });
                 }
@@ -674,26 +697,39 @@ public class LandingScreenActivity extends AppCompatActivity
 
             call.enqueue(customCallback);
             Log.d(LOG_TAG, "Waiting for response...");
-        }
+        }*/
 
     }
 
-    public void releaseQRCodeItem(final String qrCode, final boolean showConfirmation, final boolean removeLocalBooking) {
-        releaseQRCodeItem(qrCode, showConfirmation, removeLocalBooking, false);
+    public void releaseQRCodeItem(final String qrCode, final boolean showConfirmation) {
+        releaseQRCodeItem(qrCode, showConfirmation, false);
     }
 
-    public void releaseQRCodeItem(final String qrCode, final boolean showConfirmation, final boolean removeLocalBooking,
+    public void releaseQRCodeItem(final String qrCode, final boolean showConfirmation,
                                   final boolean refreshHotspots) {
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
         RetrofitService service = retrofit.create(RetrofitService.class);
 
-        BookingReleaseInput input = new BookingReleaseInput(CodeConstants.AC301, InstanceIdService.getAppInstanceId(this), qrCode);
+        int orgId = QRCodeUtil.getOrgId(qrCode);
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == orgId) {
+                privilegeId = o.getPrivilegeId();
+            }
+        }
+
+        BookingReleaseInputV2 input = new BookingReleaseInputV2();
+        input.setActionCode(CodeConstants.AC301);
+        input.setUuid(InstanceIdService.getAppInstanceId(this));
+        input.setQrCode(qrCode);
+        input.setOrgId(orgId);
+        input.setPrivilegeId(privilegeId);
+
         Log.d(LOG_TAG, "Calling the API to release...");
         Gson gson = new Gson();
         String json = gson.toJson(input); // myObject - instance of MyObject
         Log.d(LOG_TAG, "INPUT: " + json);
 
-        MyCall<BookingResponse> call = service.bookRelease(input);
+        MyCall<BookingResponse> call = service.bookReleaseV2(input);
 
         CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
             @Override
@@ -705,7 +741,7 @@ public class LandingScreenActivity extends AppCompatActivity
                 LandingScreenActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        showBookingReleaseResponse(response.body(), qrCode, showConfirmation, removeLocalBooking, refreshHotspots);
+                        showBookingReleaseResponse(response.body(), qrCode, showConfirmation, refreshHotspots);
                     }
                 });
             }
@@ -718,15 +754,27 @@ public class LandingScreenActivity extends AppCompatActivity
     public void renewQRCodeItem(final String qrCode) {
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
 
+        int orgId = QRCodeUtil.getOrgId(qrCode);
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == orgId) {
+                privilegeId = o.getPrivilegeId();
+            }
+        }
+
         Log.d(LOG_TAG, "Calling the API to renew...");
-        BookingReleaseInput input = new BookingReleaseInput(CodeConstants.AC302, InstanceIdService.getAppInstanceId(this), qrCode);
+        BookingReleaseInputV2 input = new BookingReleaseInputV2();
+        input.setActionCode(CodeConstants.AC302);
+        input.setUuid(InstanceIdService.getAppInstanceId(this));
+        input.setQrCode(qrCode);
+        input.setOrgId(orgId);
+        input.setPrivilegeId(privilegeId);
 
         Gson gson = new Gson();
         String json = gson.toJson(input);
         Log.d(LOG_TAG, "INPUT: " + json);
 
         RetrofitService service = retrofit.create(RetrofitService.class);
-        MyCall<BookingResponse> call = service.bookRelease(input);
+        MyCall<BookingResponse> call = service.bookReleaseV2(input);
 
         CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
             @Override
@@ -752,11 +800,11 @@ public class LandingScreenActivity extends AppCompatActivity
         if (br.getActionCode().equals(CodeConstants.RC302)) {
             String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
             DialogUtil.showOkDialog(this, message, false, true);
-            util.addBooking(qrCode, br.getBookedTime());
+            util.overwriteBooking(qrCode, qrCode, br.getBookedTime());
         }
     }
 
-    public void showBookingResponse(BookingResponse br, String qrCode) {
+/*    public void showBookingResponse(BookingResponse br, String qrCode) {
 
         boolean refreshFloorplan = false;
         Log.d(LOG_TAG, "Building ID from qrCode: " + QRCodeUtil.getBuildingId(qrCode) + ", SelectedBuildingId: " + selectedBuildingId);
@@ -766,10 +814,10 @@ public class LandingScreenActivity extends AppCompatActivity
 
         // set the custom dialog components - text, image and button
         if (br.getActionCode().equals(CodeConstants.RC301)) {
+            util.appendBooking(qrCode, br.getBookedTime());
             DialogUtil.showOkDialogWithCancel(this,
                     "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
                     qrCode, refreshFloorplan);
-            util.addBooking(qrCode, br.getBookedTime());
         } else if (br.getActionCode().equals(CodeConstants.RC401)) {
             String message = "Desk is not available - " + DatetimeUtil.getTimeDifference(br.getBookedTime())
                                 + " remaining on current booking.";
@@ -780,34 +828,53 @@ public class LandingScreenActivity extends AppCompatActivity
             String message = "You still have " + DatetimeUtil.getTimeDifference(br.getBookedTime()) + " remaining on this booking";
             DialogUtil.showDialogWithThreeButtons(this, message, qrCode, refreshFloorplan);
         }
-    }
+    }*/
 
     public void showBookingReleaseResponse(BookingResponse br, String qrCode,
-                                           boolean showConfirmation, boolean removeLocalBooking, boolean refreshHotspots) {
-        if (br.getActionCode().equals(CodeConstants.RC601)) {
+                                           boolean showConfirmation, boolean refreshHotspots) {
+        boolean refreshFloorplan = false;
+        Log.d(LOG_TAG, "Building ID from qrCode: " + QRCodeUtil.getBuildingId(qrCode) + ", SelectedBuildingId: " + selectedBuildingId);
+        if (QRCodeUtil.getBuildingId(qrCode) == selectedBuildingId) {
+            refreshFloorplan = true;
+        }
+
+        // set the custom dialog components - text, image and button
+        if (br.getActionCode().equals(CodeConstants.RC301)) {
+            //util.appendBooking(qrCode, br.getBookedTime());
+            DialogUtil.showOkDialogWithCancel(this,
+                    "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
+                    qrCode, refreshFloorplan);
+        } else if (br.getActionCode().equals(CodeConstants.RC601)) {
+            //util.removeBooking(qrCode);
             if (showConfirmation)
                 DialogUtil.showOkDialog(this, "Desk is now released!", refreshHotspots, false);
-            if (removeLocalBooking)
-                util.removeBooking();
         } else if (br.getActionCode().equals(CodeConstants.RC401)) {
             String message = "Desk is not available - " + DatetimeUtil.getTimeDifference(br.getBookedTime())
                     + " remaining on current booking.";
             DialogUtil.showOkDialog(this, message, false, true);
         }
+        // If user has booked the same qrCode before and has scanned the same qrCode again.
+        else if (br.getActionCode().equals(CodeConstants.RC501)) {
+            String message = "You still have " + DatetimeUtil.getTimeDifference(br.getBookedTime()) + " remaining on this booking";
+            DialogUtil.showDialogWithThreeButtons(this, message, qrCode, refreshFloorplan);
+        }
         // If user has already booked one qrCode and this is the second one booked
         else if (br.getActionCode().equals(CodeConstants.RC701)) {
-            String qrCodeOld = util.getBookingQRCode();
+            //util.appendBooking(qrCode, br.getBookedTime());
             String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
 
-            boolean refreshFloorplan = false;
-            Log.d(LOG_TAG, "Building ID from qrCode: " + QRCodeUtil.getBuildingId(qrCode) + ", SelectedBuildingId: " + selectedBuildingId);
-            if (QRCodeUtil.getBuildingId(qrCode) == selectedBuildingId) {
-                refreshFloorplan = true;
-            }
-            DialogUtil.showOkDialogWithCancelForSecondBooking(this, message, qrCodeOld, qrCode, br.getBookedTime(), refreshFloorplan);
+            DialogUtil.showOkDialog(this, message, refreshFloorplan, true);
+        }
+        // If user has already booked one qrCode and this is the second one booked
+        else if (br.getActionCode().equals(CodeConstants.RC702)) {
+            //util.overwriteBooking(br.getPrevioudQrCode(), qrCode, br.getBookedTime());
+            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+
+            DialogUtil.showOkDialog(this, message, refreshFloorplan, true);
         }
         // If user has already booked two desks, new booking is not allowed
         else if (br.getActionCode().equals(CodeConstants.RC801)) {
+            DialogUtil.showOkDialog(this, "You have exceeded your booking limit!", false, true);
         }
     }
 

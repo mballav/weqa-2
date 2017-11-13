@@ -67,8 +67,8 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
     private TextView teamName, orgName, teamPurpose, created, createdBy;
     private ImageView deleteTeamButton;
     private int teamId, orgId;
-    private String uuid;
-    private String creatorUuid = null;
+    private String creatorMobile = null;
+    private String mobileNumber;
 
     private List<TeamMemberListItem> newMemberList = new ArrayList<TeamMemberListItem>();
 
@@ -80,12 +80,11 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
 
         util = new SharedPreferencesUtil(this);
         auth = util.getAuthenticationInfo();
+        mobileNumber = auth.getMobileNo();
 
         Intent intent = getIntent();
         teamId = intent.getIntExtra("TEAM_ID", 0);
         orgId = intent.getIntExtra("ORG_ID", 0);
-
-        uuid = InstanceIdService.getAppInstanceId(this);
 
         teamMemberList = (RecyclerView) findViewById(R.id.memberList);
 
@@ -157,9 +156,9 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void deleteTeam() {
-        if (creatorUuid == null) return;
-        if (!creatorUuid.equals(uuid)) {
-            Toast.makeText(this, "Only creator can delete team", Toast.LENGTH_SHORT).show();
+        if (creatorMobile == null) return;
+        if (!creatorMobile.equals(mobileNumber)) {
+            Toast.makeText(this, R.string.only_creator, Toast.LENGTH_SHORT).show();
         }
 
         progressBar.setVisibility(View.VISIBLE);
@@ -223,13 +222,13 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View view) {
-        Intent intent=new Intent(this, CustomQRScannerActivity.class);
-
-        Log.d(LOG_TAG, "Going to add orgId to intent to CustomQRScannerActivity ----- " + orgId);
+        Intent intent=new Intent(this, TeamMemberScanActivity.class);
 
         intent.putExtra("ORG_ID", orgId);
         intent.putExtra("SCREEN_ID", 2);
+        intent.putExtra("MOBILE", mobileNumber);
         intent.putParcelableArrayListExtra("EXISTING_USERS", teamData.getListData());
+
         startActivityForResult(intent, 2);// Activity is started with requestCode 2
     }
 
@@ -290,7 +289,7 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
 
     public void updateUIWithTeamDetail(List<TeamDetailResponse> responses) {
         if (responses == null || responses.size() == 0) {
-            Toast.makeText(this, "Internal error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.fatal_error2, Toast.LENGTH_SHORT).show();
             this.finish();
         }
         TeamDetailResponse r = responses.get(0);
@@ -307,33 +306,35 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
         createdBy.setText(getCreatedBy(responses));
         orgName.setText(getOrgName(r.getOrgId()));
 
-        String creatorUuid = "";
-        List<String> uuidList = new ArrayList<String>();
+        String creatorMobile = "";
+        List<String> mobileList = new ArrayList<String>();
         List<TeamMemberListItem> memberList = new ArrayList<TeamMemberListItem>();
+
         for (TeamDetailResponse rr : responses) {
             if (rr.getTeamCreator() != null && rr.getTeamCreator()) {
-                creatorUuid = rr.getUuid();
+                creatorMobile = rr.getMobileNo();
             }
-            if (uuidList.indexOf(rr.getUuid()) == -1) {
+            if (mobileList.indexOf(rr.getMobileNo()) == -1) {
                 TeamMemberListItem item = new TeamMemberListItem();
                 item.setFirstName(rr.getFirstName());
                 item.setLastName(rr.getLastName());
                 item.setDesignation(rr.getDesignation());
                 item.setMobile(rr.getMobileNo());
-                item.setUuid(rr.getUuid());
+                item.setUuid("DUMMY");
                 item.setLocation(rr.getBuildingAddress());
                 item.setOrgId(rr.getOrgId());
                 item.setFloorLevel(rr.getFloorLevel());
                 memberList.add(item);
-                uuidList.add(rr.getUuid());
+                mobileList.add(rr.getMobileNo());
             }
         }
-        if (uuidList.size() == 1 && uuidList.get(0).equals(InstanceIdService.getAppInstanceId(this))) {
+
+        if (mobileList.size() == 1 && mobileList.get(0).equals(mobileNumber)) {
             deleteTeamButton.setVisibility(View.VISIBLE);
         }
 
         teamData.addMembers(memberList);
-        adapter = new TeamMember2ListAdapter(teamData, this, teamId, creatorUuid);
+        adapter = new TeamMember2ListAdapter(teamData, this, teamId, creatorMobile);
         teamMemberList.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         progressBar.setVisibility(View.GONE);
@@ -343,7 +344,7 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
     private String getCreatedBy(List<TeamDetailResponse> responses) {
         for (TeamDetailResponse rr : responses) {
             if (rr.getTeamCreator() != null && rr.getTeamCreator()) {
-                creatorUuid = rr.getUuid();
+                creatorMobile = rr.getMobileNo();
                 return rr.getFirstName() + " " + rr.getLastName();
             }
         }
@@ -409,14 +410,14 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void teamMembersAdded() {
-        Toast.makeText(TeamDetailActivity.this, "Team information saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(TeamDetailActivity.this, R.string.team_members_added, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         setResult(10, intent);
         this.finish();
     }
 
     public void updateUIAfterTeamDelete() {
-        Toast.makeText(TeamDetailActivity.this, "Team deleted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(TeamDetailActivity.this, R.string.team_deleted, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         setResult(10, intent);
         this.finish();

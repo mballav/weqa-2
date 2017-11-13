@@ -31,6 +31,7 @@ import com.weqa.adapter.GrantedListAdapter;
 import com.weqa.adapter.OrgListAdapter;
 import com.weqa.framework.CustomCallback;
 import com.weqa.framework.MyCall;
+import com.weqa.model.Authentication;
 import com.weqa.model.CodeConstants;
 import com.weqa.model.adapterdata.GrantedListData;
 import com.weqa.model.adapterdata.GrantedListItem;
@@ -45,6 +46,7 @@ import com.weqa.service.InstanceIdService;
 import com.weqa.service.RetrofitBuilder;
 import com.weqa.service.RetrofitService;
 import com.weqa.util.GlobalExceptionHandler;
+import com.weqa.util.SharedPreferencesUtil;
 import com.weqa.util.UIHelper;
 
 import org.w3c.dom.Text;
@@ -70,7 +72,9 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
     private GrantedListItem newGrantItem;
 
     private TextView nameText, mobileText, endDate;
+    private TextView titleText;
     private Button grantButton;
+    private RelativeLayout middlePanel;
     private int orgId;
 
     private RelativeLayout progressBarContainer;
@@ -79,6 +83,9 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
     private int mDay, mMonth, mYear;
+
+    private SharedPreferencesUtil util;
+    private String mobileNumber;
 
     private BarcodeCallback callback = new BarcodeCallback() {
 
@@ -91,6 +98,11 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
 
             if (!isValidUserCode(code)) {
                 scanner.setStatusText("Invalid QR Code!");
+                return;
+            }
+
+            if (isUserSelf(code)) {
+                scanner.setStatusText("You cannot add self!");
                 return;
             }
 
@@ -108,6 +120,7 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
             endDate.setText(dateFormat.format(newGrantItem.getEndDate()));
 
             grantButton.setEnabled(true);
+            middlePanel.setVisibility(View.VISIBLE);
 
             beepManager.playBeepSoundAndVibrate();
         }
@@ -124,8 +137,11 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_guest_user);
 
         Intent i = getIntent();
-//        orgId = i.getIntExtra("ORG_ID", 0);
-        orgId = 1;
+        orgId = i.getIntExtra("ORG_ID", 0);
+
+        util = new SharedPreferencesUtil(this);
+        Authentication auth = util.getAuthenticationInfo();
+        mobileNumber = auth.getMobileNo();
 
         scanner = (DecoratedBarcodeView) findViewById(R.id.zxing_barcode_scanner);
         scanner.decodeContinuous(callback);
@@ -139,6 +155,17 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
         nameText.setText("Name");
         mobileText.setText("Mobile");
         endDate.setText("Grant Date");
+
+        middlePanel = (RelativeLayout) findViewById(R.id.middlePanel);
+        middlePanel.setVisibility(View.GONE);
+
+        titleText = (TextView) findViewById(R.id.titleText);
+/*        titleText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                middlePanel.setVisibility(View.VISIBLE);
+            }
+        });*/
 
         grantButton = (Button) findViewById(R.id.grantButton);
         grantButton.setEnabled(false);
@@ -247,6 +274,10 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void afterGetGuests(List<GetGuestResponse> guestList) {
+        if (guestList == null || guestList.size() == 0) {
+            titleText.setVisibility(View.GONE);
+        }
+
         for (GetGuestResponse r : guestList) {
             GrantedListItem item = new GrantedListItem();
             item.setFirstName(r.getFirstName());
@@ -347,6 +378,7 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
 
         grantButton.setEnabled(false);
         progress1.setVisibility(View.GONE);
+        middlePanel.setVisibility(View.GONE);
     }
 
     @Override
@@ -417,6 +449,13 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
         return tokens[1];
     }
 
+    private boolean isUserSelf(String code) {
+        String[] tokens = code.split(",");
+        if (mobileNumber.equals(tokens[6])) {
+            return true;
+        }
+        return false;
+    }
     /*
     private boolean isUserAlreadyGrantedAccess(String uuid) {
         boolean found = false;
@@ -466,7 +505,8 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
             Calendar cal = Calendar.getInstance();
             cal.set(year, monthOfYear, dayOfMonth);
             endDate.setText(dateFormat.format(cal.getTime()));
-            newGrantItem.setEndDate(cal.getTime());
+            if (newGrantItem != null)
+               newGrantItem.setEndDate(cal.getTime());
         }
     };
 }

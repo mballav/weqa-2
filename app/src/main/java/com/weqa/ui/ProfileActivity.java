@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -122,17 +123,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             doneButton.setOnTouchListener(this);
         }
 
-        TextView text0 = (TextView) findViewById(R.id.text0);
-        TextView text1 = (TextView) findViewById(R.id.text1);
-        TextView text2 = (TextView) findViewById(R.id.text2);
-        TextView text3 = (TextView) findViewById(R.id.text3);
-        TextView text4 = (TextView) findViewById(R.id.text4);
+        RelativeLayout orgContainer = (RelativeLayout) findViewById(R.id.orgContainer);
 
-        text0.setOnClickListener(this);
-        text1.setOnClickListener(this);
-        text2.setOnClickListener(this);
-        text3.setOnClickListener(this);
-        text4.setOnClickListener(this);
+        orgContainer.setOnClickListener(this);
 
         progress1 = (ProgressBar) findViewById(R.id.progress1);
         progress1.setVisibility(View.GONE);
@@ -152,11 +145,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.text0) {
+        if (view.getId() == R.id.orgContainer) {
             authenticate();
         }
         else {
-            Toast.makeText(this, "Under Development", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.under_dev, Toast.LENGTH_SHORT).show();
         }
     }
 

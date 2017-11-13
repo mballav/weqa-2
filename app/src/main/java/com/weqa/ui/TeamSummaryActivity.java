@@ -1,7 +1,6 @@
 package com.weqa.ui;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,21 +23,20 @@ import com.weqa.adapter.TeamSummaryListAdapter;
 import com.weqa.framework.CustomCallback;
 import com.weqa.framework.MyCall;
 import com.weqa.model.BookingInput;
+import com.weqa.model.BookingInputV2;
 import com.weqa.model.BookingReleaseInput;
+import com.weqa.model.BookingReleaseInputV2;
 import com.weqa.model.BookingResponse;
 import com.weqa.model.CodeConstants;
 import com.weqa.model.CollaborationInput;
 import com.weqa.model.CollaborationResponse;
+import com.weqa.model.Org;
 import com.weqa.model.adapterdata.TeamSummaryListData;
 import com.weqa.model.adapterdata.TeamSummaryListItem;
 import com.weqa.service.InstanceIdService;
 import com.weqa.service.RetrofitBuilder;
 import com.weqa.service.RetrofitService;
 import com.weqa.util.GlobalExceptionHandler;
-import com.weqa.util.async.BookingAsyncTask;
-import com.weqa.util.async.BookingReleaseAsyncTask;
-import com.weqa.util.async.BookingRenewAsyncTask;
-import com.weqa.util.async.CollaborationAsyncTask;
 import com.weqa.util.DatetimeUtil;
 import com.weqa.util.ui.DialogUtil;
 import com.weqa.util.QRCodeUtil;
@@ -66,6 +64,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
 
     private SharedPreferencesUtil util;
     private int orgId;
+    private int privilegeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,22 +116,16 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         });
 
         LinearLayout menu1 = (LinearLayout) findViewById(R.id.menu1);
-        LinearLayout menu2 = (LinearLayout) findViewById(R.id.menu2);
         LinearLayout menu3 = (LinearLayout) findViewById(R.id.menu3);
         LinearLayout menu4 = (LinearLayout) findViewById(R.id.menu4);
-        LinearLayout menu5 = (LinearLayout) findViewById(R.id.menu5);
 
         menu1.setOnClickListener(this);
-        menu2.setOnClickListener(this);
         menu3.setOnClickListener(this);
         menu4.setOnClickListener(this);
-        menu5.setOnClickListener(this);
 
         menu1.setOnTouchListener(this);
-        menu2.setOnTouchListener(this);
         menu3.setOnTouchListener(this);
         menu4.setOnTouchListener(this);
-        menu5.setOnTouchListener(this);
 
         CircleImageView profilePicture = (CircleImageView) findViewById(R.id.profilepicture);
         profilePicture.setOnClickListener(this);
@@ -141,6 +134,13 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         util = new SharedPreferencesUtil(this);
 
         orgId = util.getDefaultOrganization();
+        // Find the privilege id for the default org
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == orgId) {
+                privilegeId = o.getPrivilegeId();
+                break;
+            }
+        }
 
         noteams = (TextView) findViewById(R.id.noteams);
 
@@ -220,7 +220,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
             this.finish();
         }
         else if (v.getId() != R.id.menu4){
-            Toast.makeText(v.getContext(), "Under Development", Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(), R.string.under_dev, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -237,7 +237,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null) {
                 if (result.getContents() == null) {
-                    Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
+                    Toast.makeText(this, R.string.cancelled, Toast.LENGTH_LONG).show();QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
                 } else {
                     String qrCode = result.getContents();
                     QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
@@ -258,80 +258,31 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
         RetrofitService service = retrofit.create(RetrofitService.class);
 
-        String qrCodeBooked = util.getBookingQRCode();
+        //List<String> qrCodeBookedList = util.getBookingQRCodeList();
+
+        int orgId = QRCodeUtil.getOrgId(qrCode);
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == orgId) {
+                privilegeId = o.getPrivilegeId();
+            }
+        }
+
         // Case of new booking or Re-Booking
-        if (qrCodeBooked == null || qrCodeBooked.equals(qrCode)) {
+        //if (qrCodeBookedList.size() == 0 || (qrCodeBookedList.indexOf(qrCode) != -1)) {
 
-            Log.d(LOG_TAG, "Calling the API to book...");
+        Log.d(LOG_TAG, "Calling the API to book...");
 
-            BookingInput input = new BookingInput(InstanceIdService.getAppInstanceId(this), qrCode);
-            Gson gson = new Gson();
-            String json = gson.toJson(input); // myObject - instance of MyObject
-            Log.d(LOG_TAG, "INPUT: " + json);
+        BookingInputV2 input = new BookingInputV2();
+        input.setUuid(InstanceIdService.getAppInstanceId(this));
+        input.setQrCode(qrCode);
+        input.setOrgId(orgId);
+        input.setPrivilegeId(privilegeId);
 
-            MyCall<BookingResponse> call = service.book(input);
-
-            CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
-                @Override
-                public void success(final Response<BookingResponse> response) {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(response.body());
-                    Log.d(LOG_TAG, "OUTPUT: " + json);
-
-                    TeamSummaryActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showBookingResponse(response.body(), qrCode);
-                        }
-                    });
-                }
-            };
-            call.enqueue(customCallback);
-            Log.d(LOG_TAG, "Waiting for response...");
-        }
-        // Case of double booking
-        else if (!qrCodeBooked.equals(qrCode)) {
-            BookingReleaseInput input = new BookingReleaseInput(CodeConstants.AC601, InstanceIdService.getAppInstanceId(this), qrCode);
-
-            Log.d(LOG_TAG, "Calling the API to release...");
-
-            Gson gson = new Gson();
-            String json = gson.toJson(input); // myObject - instance of MyObject
-            Log.d(LOG_TAG, "INPUT: " + json);
-
-            MyCall<BookingResponse> call = service.bookRelease(input);
-
-            CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
-                @Override
-                public void success(final Response<BookingResponse> response) {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(response.body());
-                    Log.d(LOG_TAG, "OUTPUT: " + json);
-
-                    TeamSummaryActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showBookingReleaseResponse(response.body(), qrCode, true, false);
-                        }
-                    });
-                }
-            };
-            call.enqueue(customCallback);
-            Log.d(LOG_TAG, "Waiting for response...");
-        }
-    }
-
-    public void releaseQRCodeItem(final String qrCode, final boolean showConfirmation, final boolean removeLocalBooking) {
-        Retrofit retrofit = RetrofitBuilder.getRetrofit();
-        RetrofitService service = retrofit.create(RetrofitService.class);
-
-        BookingReleaseInput input = new BookingReleaseInput(CodeConstants.AC301, InstanceIdService.getAppInstanceId(this), qrCode);
-        Log.d(LOG_TAG, "Calling the API to release...");
         Gson gson = new Gson();
         String json = gson.toJson(input); // myObject - instance of MyObject
         Log.d(LOG_TAG, "INPUT: " + json);
 
-        MyCall<BookingResponse> call = service.bookRelease(input);
+        MyCall<BookingResponse> call = service.bookV2(input);
 
         CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
             @Override
@@ -343,7 +294,90 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
                 TeamSummaryActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        showBookingReleaseResponse(response.body(), qrCode, showConfirmation, removeLocalBooking);
+                        showBookingReleaseResponse(response.body(), qrCode, true);
+                    }
+                });
+            }
+        };
+
+        call.enqueue(customCallback);
+        Log.d(LOG_TAG, "Waiting for response...");
+/*        }
+        // Case of multiple booking
+        else if (qrCodeBookedList.indexOf(qrCode) == -1) {
+            BookingReleaseInputV2 input = new BookingReleaseInputV2();
+            input.setActionCode(CodeConstants.AC601);
+            input.setUuid(InstanceIdService.getAppInstanceId(this));
+            input.setQrCode(qrCode);
+            input.setOrgId(orgId);
+            input.setPrivilegeId(privilegeId);
+
+            Log.d(LOG_TAG, "Calling the API to release...");
+
+            Gson gson = new Gson();
+            String json = gson.toJson(input); // myObject - instance of MyObject
+            Log.d(LOG_TAG, "INPUT: " + json);
+
+            MyCall<BookingResponse> call = service.bookReleaseV2(input);
+
+            CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
+                @Override
+                public void success(final Response<BookingResponse> response) {
+                    Gson gson = new Gson();
+                    String json = gson.toJson(response.body());
+                    Log.d(LOG_TAG, "OUTPUT: " + json);
+
+                    LandingScreenActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showBookingReleaseResponse(response.body(), qrCode, true, false);
+                        }
+                    });
+                }
+            };
+
+            call.enqueue(customCallback);
+            Log.d(LOG_TAG, "Waiting for response...");
+        }*/
+
+    }
+
+    public void releaseQRCodeItem(final String qrCode, final boolean showConfirmation) {
+        Retrofit retrofit = RetrofitBuilder.getRetrofit();
+        RetrofitService service = retrofit.create(RetrofitService.class);
+
+        int codeOrgId = QRCodeUtil.getOrgId(qrCode);
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == codeOrgId) {
+                privilegeId = o.getPrivilegeId();
+            }
+        }
+
+        BookingReleaseInputV2 input = new BookingReleaseInputV2();
+        input.setActionCode(CodeConstants.AC301);
+        input.setUuid(InstanceIdService.getAppInstanceId(this));
+        input.setQrCode(qrCode);
+        input.setOrgId(codeOrgId);
+        input.setPrivilegeId(privilegeId);
+
+        Log.d(LOG_TAG, "Calling the API to release...");
+        Gson gson = new Gson();
+        String json = gson.toJson(input); // myObject - instance of MyObject
+        Log.d(LOG_TAG, "INPUT: " + json);
+
+        MyCall<BookingResponse> call = service.bookReleaseV2(input);
+
+        CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
+            @Override
+            public void success(final Response<BookingResponse> response) {
+                Gson gson = new Gson();
+                String json = gson.toJson(response.body());
+                Log.d(LOG_TAG, "OUTPUT: " + json);
+
+                TeamSummaryActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showBookingReleaseResponse(response.body(), qrCode, showConfirmation);
                     }
                 });
             }
@@ -356,15 +390,26 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
     public void renewQRCodeItem(final String qrCode) {
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
 
+        int codeOrgId = QRCodeUtil.getOrgId(qrCode);
+        for (Org o : util.getAuthenticationInfo().getOrganization()) {
+            if (o.getOrganizationId() == codeOrgId) {
+                privilegeId = o.getPrivilegeId();
+            }
+        }
         Log.d(LOG_TAG, "Calling the API to renew...");
-        BookingReleaseInput input = new BookingReleaseInput(CodeConstants.AC302, InstanceIdService.getAppInstanceId(this), qrCode);
+        BookingReleaseInputV2 input = new BookingReleaseInputV2();
+        input.setActionCode(CodeConstants.AC302);
+        input.setUuid(InstanceIdService.getAppInstanceId(this));
+        input.setQrCode(qrCode);
+        input.setOrgId(codeOrgId);
+        input.setPrivilegeId(privilegeId);
 
         Gson gson = new Gson();
         String json = gson.toJson(input);
         Log.d(LOG_TAG, "INPUT: " + json);
 
         RetrofitService service = retrofit.create(RetrofitService.class);
-        MyCall<BookingResponse> call = service.bookRelease(input);
+        MyCall<BookingResponse> call = service.bookReleaseV2(input);
 
         CustomCallback<BookingResponse> customCallback = new CustomCallback<BookingResponse>(call.getUrl(), this) {
             @Override
@@ -390,19 +435,20 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         if (br.getActionCode().equals(CodeConstants.RC302)) {
             String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
             DialogUtil.showOkDialog(this, message, true);
-            util.addBooking(qrCode, br.getBookedTime());
+            util.overwriteBooking(qrCode, qrCode, br.getBookedTime());
         }
         fetchTeamData();
     }
 
+    /*
     public void showBookingResponse(BookingResponse br, String qrCode) {
 
         // set the custom dialog components - text, image and button
         if (br.getActionCode().equals(CodeConstants.RC301)) {
+            util.appendBooking(qrCode, br.getBookedTime());
             DialogUtil.showOkDialogWithCancel(this,
                     "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
                     qrCode);
-            util.addBooking(qrCode, br.getBookedTime());
         } else if (br.getActionCode().equals(CodeConstants.RC401)) {
             String message = "Desk is not available - " + DatetimeUtil.getTimeDifference(br.getBookedTime())
                     + " remaining on current booking.";
@@ -414,15 +460,25 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
             DialogUtil.showDialogWithThreeButtons(this, message, qrCode);
         }
         fetchTeamData();
-    }
+    }*/
 
     public void showBookingReleaseResponse(BookingResponse br, String qrCode,
-                                           boolean showConfirmation, boolean removeLocalBooking) {
-        if (br.getActionCode().equals(CodeConstants.RC601)) {
+                                           boolean showConfirmation) {
+        if (br.getActionCode().equals(CodeConstants.RC301)) {
+            //util.appendBooking(qrCode, br.getBookedTime());
+            DialogUtil.showOkDialogWithCancel(this,
+                    "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
+                    qrCode);
+        }
+        // If user has booked the same qrCode before and has scanned the same qrCode again.
+        else if (br.getActionCode().equals(CodeConstants.RC501)) {
+            String message = "You still have " + DatetimeUtil.getTimeDifference(br.getBookedTime()) + " remaining on this booking";
+            DialogUtil.showDialogWithThreeButtons(this, message, qrCode);
+        }
+        else if (br.getActionCode().equals(CodeConstants.RC601)) {
+            //util.removeBooking(qrCode);
             if (showConfirmation)
                 DialogUtil.showOkDialog(this, "Desk is now released!", false);
-            if (removeLocalBooking)
-                util.removeBooking();
         } else if (br.getActionCode().equals(CodeConstants.RC401)) {
             String message = "Desk is not available - " + DatetimeUtil.getTimeDifference(br.getBookedTime())
                     + " remaining on current booking.";
@@ -430,13 +486,21 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         }
         // If user has already booked one qrCode and this is the second one booked
         else if (br.getActionCode().equals(CodeConstants.RC701)) {
-            String qrCodeOld = util.getBookingQRCode();
+            //util.appendBooking(qrCode, br.getBookedTime());
             String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
 
-            DialogUtil.showOkDialogWithCancelForSecondBooking(this, message, qrCodeOld, qrCode, br.getBookedTime());
+            DialogUtil.showOkDialog(this, message, true);
+        }
+        // If user has already booked one qrCode and this is the second one booked
+        else if (br.getActionCode().equals(CodeConstants.RC702)) {
+            //util.overwriteBooking(br.getPrevioudQrCode(), qrCode, br.getBookedTime());
+            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+
+            DialogUtil.showOkDialog(this, message, true);
         }
         // If user has already booked two desks, new booking is not allowed
         else if (br.getActionCode().equals(CodeConstants.RC801)) {
+            DialogUtil.showOkDialog(this, "You have exceeded your booking limit!", true);
         }
         fetchTeamData();
     }
@@ -460,7 +524,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
             TeamSummaryListItem item = new TeamSummaryListItem();
             item.setTeamName(r.getTeamName());
             item.setNumberOfMembers(r.getTotalMember());
-            item.setCreatedDate(DatetimeUtil.getDateFromGMT(r.getCreationDate()));
+            item.setCreatedDate(DatetimeUtil.getDateFromAEDT(r.getCreationDate()));
             item.setColocated(r.getCoLocated());
             item.setOrg(false);
             item.setTeamId(r.getTeamId());

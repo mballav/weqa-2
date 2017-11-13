@@ -74,35 +74,136 @@ public class SharedPreferencesUtil {
         return (double) spConfig.getInt(Configuration.GEO_FENCE, 0);
     }
 
-    public void addBooking(String qrCode, String expiryDateTime) {
-        spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = spHistory.edit();
-        editor.putString(QRCODE_BOOKING, qrCode + "_" + expiryDateTime);
-        editor.commit();
-    }
-
-    public void removeBooking() {
+    public void overwriteBooking(String qrCodeOld, String qrCodeNew, String expiryDateTime) {
         spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
         String code = spHistory.getString(QRCODE_BOOKING, "");
-        if (!code.equals("")) {
+        if (code.equals("")) {
             SharedPreferences.Editor editor = spHistory.edit();
-            editor.remove(QRCODE_BOOKING);
+            editor.putString(QRCODE_BOOKING, qrCodeNew + "_" + expiryDateTime);
+            editor.commit();
+        }
+        else {
+            String[] bookings = code.split("=");
+            StringBuffer sb = new StringBuffer("");
+            boolean firstTime = true;
+            for (String booking : bookings) {
+                String[] tokens = booking.split("_");
+                if (firstTime) {
+                    firstTime = false;
+                }
+                else {
+                    sb.append("=");
+                }
+                if (tokens[0].equals(qrCodeOld)) {
+                    sb.append(qrCodeNew + "_" + expiryDateTime);
+                }
+                else {
+                    sb.append(booking);
+                }
+            }
+            SharedPreferences.Editor editor = spHistory.edit();
+            editor.putString(QRCODE_BOOKING, sb.toString());
             editor.commit();
         }
     }
 
-    public String getBookingQRCode() {
+    public void appendBooking(String qrCode, String expiryDateTime) {
         spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
         String code = spHistory.getString(QRCODE_BOOKING, "");
-        if (code.equals("")) return null;
-        String[] codes = code.split("_");
-        if (!DatetimeUtil.isDateExpired(codes[1])) {
-            return codes[0];
+        SharedPreferences.Editor editor = spHistory.edit();
+        if (code.trim().equals("")) {
+            editor.putString(QRCODE_BOOKING, qrCode + "_" + expiryDateTime);
         }
         else {
-            removeBooking();
-            return null;
+            editor.putString(QRCODE_BOOKING, code + "=" + qrCode + "_" + expiryDateTime);
         }
+        editor.commit();
+    }
+
+    public void removeBooking(String qrCode) {
+        spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
+        String code = spHistory.getString(QRCODE_BOOKING, "");
+
+        if (code.equals("")) return;
+
+        String[] bookings = code.split("=");
+        if (bookings.length == 1) {
+            SharedPreferences.Editor editor = spHistory.edit();
+            editor.remove(QRCODE_BOOKING);
+            editor.commit();
+        }
+        else {
+            StringBuffer sb = new StringBuffer("");
+            boolean firstTime = true;
+            for (String booking : bookings) {
+                String[] tokens = booking.split("_");
+                if (!tokens[0].equals(qrCode)) {
+                    if (firstTime) {
+                        firstTime = false;
+                    }
+                    else {
+                        sb.append("=");
+                    }
+                    sb.append(booking);
+                }
+            }
+            SharedPreferences.Editor editor = spHistory.edit();
+            editor.putString(QRCODE_BOOKING, sb.toString());
+            editor.commit();
+        }
+    }
+
+    public List<String> getBookingQRCodeList() {
+        List<String> qrCodeList = new ArrayList<String>();
+
+        spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
+        String code = spHistory.getString(QRCODE_BOOKING, "");
+        Log.d(logTag, "QRCODE_BOOKING String = " + code);
+
+        if (code.equals("")) return qrCodeList;
+
+        String[] bookings = code.split("=");
+
+        for (String booking : bookings) {
+            String[] tokens = booking.split("_");
+            if (!DatetimeUtil.isDateExpired(tokens[1])) {
+                qrCodeList.add(tokens[0]);
+            }
+        }
+        return qrCodeList;
+    }
+
+    public void removeBookings() {
+        spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = spHistory.edit();
+        editor.remove(QRCODE_BOOKING);
+        editor.commit();
+    }
+
+    public void purgeExpiredBookings() {
+        spHistory = context.getSharedPreferences(HISTORY_FILENAME, Context.MODE_PRIVATE);
+        String code = spHistory.getString(QRCODE_BOOKING, "");
+        if (code.equals("")) return;
+
+        String[] bookings = code.split("=");
+
+        StringBuffer sb = new StringBuffer("");
+        boolean firstTime = true;
+        for (String booking : bookings) {
+            String[] tokens = booking.split("_");
+            if (!DatetimeUtil.isDateExpired(tokens[1])) {
+                if (firstTime) {
+                    firstTime = false;
+                }
+                else {
+                    sb.append("=");
+                }
+                sb.append(booking);
+            }
+        }
+        SharedPreferences.Editor editor = spHistory.edit();
+        editor.putString(QRCODE_BOOKING, sb.toString());
+        editor.commit();
     }
 
     public void setNoSpaceOnDevice(boolean noSpaceOnDevice) {

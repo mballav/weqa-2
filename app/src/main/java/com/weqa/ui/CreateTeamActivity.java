@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -51,7 +52,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
 
     private static final String LOG_TAG = "WEQA-LOG";
 
-    private Spinner spinner;
+    private TextView orgName;
     private RecyclerView teamMemberList;
     private ProgressBar progressBar;
     private RelativeLayout container;
@@ -61,6 +62,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
     private TeamMemberListAdapter adapter;
     private List<Org> orgList;
     private List<String> orgNameList;
+    private int defaultOrgId;
 
     private String mobileNumber;
 
@@ -71,19 +73,21 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_create_team);
 
         util = new SharedPreferencesUtil(this);
-        orgNameList = util.getOrganizationNameList();
-
         Authentication auth = util.getAuthenticationInfo();
-        orgList = auth.getOrganization();
+
         mobileNumber = auth.getMobileNo();
+        defaultOrgId = util.getDefaultOrganization();
 
-        spinner = (Spinner) findViewById(R.id.spinner);
+        String defaultOrgName = "";
+        for (Org o : auth.getOrganization()) {
+            if (o.getOrganizationId() == defaultOrgId) {
+                defaultOrgName = o.getOrganizationName();
+                break;
+            }
+        }
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                R.layout.spinner_item2, orgNameList);
-        dataAdapter.setDropDownViewResource(R.layout.spinner_item2);
-        spinner.setAdapter(dataAdapter);
-        spinner.setSelection(0);
+        orgName = (TextView) findViewById(R.id.orgName);
+        orgName.setText(defaultOrgName);
 
         teamMemberList = (RecyclerView) findViewById(R.id.memberList);
 
@@ -180,7 +184,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
     private void createTeam() {
 
         if (teamName.getText() == null || teamName.getText().toString().trim().equals("")) {
-            Toast.makeText(this, "Team name cannot be blank", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.team_not_blank, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -203,7 +207,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
         CreateTeamInput input = new CreateTeamInput();
         input.setTeamName(teamName.getText().toString());
         input.setTeamDescription(purpose);
-        input.setOrgid((int) getOrgId(spinner.getSelectedItemPosition()));
+        input.setOrgid(defaultOrgId);
         input.setCreatedByUUID(creatorUUID);
 
         List<UuidList> uuidList = new ArrayList<UuidList>();
@@ -250,11 +254,10 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         Intent intent=new Intent(this, CustomQRScannerActivity.class);
-        int position = spinner.getSelectedItemPosition();
-        intent.putExtra("ORG_ID", getOrgId(position));
+        intent.putExtra("ORG_ID", defaultOrgId);
         intent.putExtra("MOBILE", mobileNumber);
 
-        Log.d(LOG_TAG, "-------------------------------------------- ORG ID = " + getOrgId(position));
+        Log.d(LOG_TAG, "-------------------------------------------- ORG ID = " + defaultOrgId);
 
         intent.putExtra("SCREEN_ID", 1);
         intent.putParcelableArrayListExtra("EXISTING_USERS", teamData.getListData());
@@ -296,7 +299,7 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void updateUI() {
 
-        Toast.makeText(this, "Team created", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.team_created, Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent();
         setResult(5, intent);

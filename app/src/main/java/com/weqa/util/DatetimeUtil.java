@@ -15,25 +15,25 @@ public class DatetimeUtil {
 
     private static final String LOG_TAG = "WEQA-LOG";
 
-    public static Date getDateFromGMT(String GMTString) {
+    public static Date getDateFromAEDT(String AEDTString) {
         try {
-            String firstPart = GMTString.substring(0, 19);
+            String firstPart = AEDTString.substring(0, 19);
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
             Date date = inputFormat.parse(firstPart);
             return date;
         }
         catch (ParseException pe) {
-            Log.d(LOG_TAG, "Error parsing GMT Date");
+            Log.d(LOG_TAG, "Error parsing AEDT Date");
         }
         return null;
     }
 
-    public static String getLocalDate(String GMTString) {
+    public static String getLocalDate(String AEDTString) {
         try {
-            String firstPart = GMTString.substring(0, 19);
+            String firstPart = AEDTString.substring(0, 19);
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
             Date date = inputFormat.parse(firstPart);
 
             // Potentially use the default locale. This will use the local time zone already.
@@ -43,16 +43,16 @@ public class DatetimeUtil {
             return outputText;
         }
         catch (ParseException pe) {
-            Log.d(LOG_TAG, "Error parsing GMT Date");
+            Log.d(LOG_TAG, "Error parsing AEDT Date");
         }
         return "";
     }
 
-    public static String getLocalDateTime(String GMTString) {
+    public static String getLocalDateTime(String AEDTString) {
         try {
-            String firstPart = GMTString.substring(0, 19);
+            String firstPart = AEDTString.substring(0, 19);
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
             Date date = inputFormat.parse(firstPart);
 
             // Potentially use the default locale. This will use the local time zone already.
@@ -62,17 +62,17 @@ public class DatetimeUtil {
             return outputText;
         }
         catch (ParseException pe) {
-            Log.d(LOG_TAG, "Error parsing GMT Date");
+            Log.d(LOG_TAG, "Error parsing AEDT Date");
         }
         return "";
     }
 
-    public static boolean isDateExpired(String GMTString) {
+    public static boolean isDateExpired(String AEDTString) {
         try {
-            String firstPart = GMTString.substring(0, 19);
+            String firstPart = AEDTString.substring(0, 19);
             Log.d(LOG_TAG, "First part of the date STRING is " + firstPart);
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
             Date date = inputFormat.parse(firstPart);
 
             Date currentDate = new Date();
@@ -80,17 +80,17 @@ public class DatetimeUtil {
             if (currentDate.before(date)) return false;
         }
         catch (ParseException pe) {
-            Log.d(LOG_TAG, "Error parsing GMT Date");
+            Log.d(LOG_TAG, "Error parsing AEDT Date");
         }
         return true;
     }
 
-    public static String getTimeDifference(String GMTString) {
+    public static String getTimeDifference(String AEDTString) {
         try {
-            String firstPart = GMTString.substring(0, 19);
+            String firstPart = AEDTString.substring(0, 19);
             Log.d(LOG_TAG, "First part of the date STRING is " + firstPart);
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
             Date date = inputFormat.parse(firstPart);
 
             Date currentDate = new Date();
@@ -108,8 +108,12 @@ public class DatetimeUtil {
             return outputText;
         }
         catch (ParseException pe) {
-            Log.d(LOG_TAG, "Error parsing GMT Date");
+            Log.d(LOG_TAG, "Error parsing AEDT Date");
         }
         return "";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getTimeDifference("2017-11-05T00:19:16.527"));
     }
 }
