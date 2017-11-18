@@ -36,8 +36,6 @@ public class TeamMember2ListAdapter extends RecyclerView.Adapter<TeamMember2List
 
     private static final String LOG_TAG = "WEQA-LOG";
 
-    private String uuid;
-
     class TeamMemberItemHolder extends RecyclerView.ViewHolder {
 
         private TextView name, mobile, designation, location;
@@ -58,15 +56,16 @@ public class TeamMember2ListAdapter extends RecyclerView.Adapter<TeamMember2List
     protected TeamMemberListData itemData;
     protected TeamDetailActivity activity;
     private long teamId;
-    private String creatorUuid;
+    private String creatorMobile;
+    private String userMobile;
 
-    public TeamMember2ListAdapter(TeamMemberListData itemData, TeamDetailActivity activity, long teamId, String creatorUuid){
+    public TeamMember2ListAdapter(TeamMemberListData itemData, TeamDetailActivity activity, long teamId, String creatorMobile, String userMobile){
         inflater = LayoutInflater.from(activity);
         this.itemData = itemData;
         this.activity = activity;
         this.teamId = teamId;
-        this.creatorUuid = creatorUuid;
-        this.uuid = InstanceIdService.getAppInstanceId(activity);
+        this.creatorMobile = creatorMobile;
+        this.userMobile = userMobile;
     }
 
     public void setItemData(TeamMemberListData itemData) {
@@ -88,12 +87,12 @@ public class TeamMember2ListAdapter extends RecyclerView.Adapter<TeamMember2List
         if (item.getLocation() != null && !item.getLocation().isEmpty()) {
             holder.location.setText(item.getFloorLevel() + ", " + item.getLocation());
         }
-        if (item.getUuid().equals(uuid) && (!item.getUuid().equals(creatorUuid))) {
+        if (item.getMobile().equals(userMobile) && (!item.getMobile().equals(creatorMobile))) {
             holder.removeButton.setVisibility(View.VISIBLE);
             holder.removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteTeamMember(position, item.getUuid(), item.getOrgId(), teamId);
+                    deleteTeamMember(position, InstanceIdService.getAppInstanceId(activity), item.getOrgId(), teamId);
                 }
             });
         }

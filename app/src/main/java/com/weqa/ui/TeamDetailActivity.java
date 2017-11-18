@@ -157,9 +157,6 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
 
     public void deleteTeam() {
         if (creatorMobile == null) return;
-        if (!creatorMobile.equals(mobileNumber)) {
-            Toast.makeText(this, R.string.only_creator, Toast.LENGTH_SHORT).show();
-        }
 
         progressBar.setVisibility(View.VISIBLE);
         teamMemberList.setVisibility(View.GONE);
@@ -222,7 +219,7 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View view) {
-        Intent intent=new Intent(this, TeamMemberScanActivity.class);
+        Intent intent = new Intent(this, TeamMemberScanActivity.class);
 
         intent.putExtra("ORG_ID", orgId);
         intent.putExtra("SCREEN_ID", 2);
@@ -320,7 +317,7 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
                 item.setLastName(rr.getLastName());
                 item.setDesignation(rr.getDesignation());
                 item.setMobile(rr.getMobileNo());
-                item.setUuid("DUMMY");
+                item.setUuid(rr.getUuid());
                 item.setLocation(rr.getBuildingAddress());
                 item.setOrgId(rr.getOrgId());
                 item.setFloorLevel(rr.getFloorLevel());
@@ -334,7 +331,7 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
         }
 
         teamData.addMembers(memberList);
-        adapter = new TeamMember2ListAdapter(teamData, this, teamId, creatorMobile);
+        adapter = new TeamMember2ListAdapter(teamData, this, teamId, creatorMobile, mobileNumber);
         teamMemberList.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         progressBar.setVisibility(View.GONE);
@@ -410,14 +407,12 @@ public class TeamDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void teamMembersAdded() {
-        Toast.makeText(TeamDetailActivity.this, R.string.team_members_added, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         setResult(10, intent);
         this.finish();
     }
 
     public void updateUIAfterTeamDelete() {
-        Toast.makeText(TeamDetailActivity.this, R.string.team_deleted, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         setResult(10, intent);
         this.finish();

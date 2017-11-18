@@ -81,7 +81,7 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
     private ProgressBar progress1;
     private DatePickerDialog dpd;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
     private int mDay, mMonth, mYear;
 
     private SharedPreferencesUtil util;
@@ -106,21 +106,16 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
                 return;
             }
 
-            /*
-            String uuid = getUuid(code);
-
-            if (isUserAlreadyGrantedAccess(uuid)) {
-                scanner.setStatusText("User already granted access!");
-                return;
-            }*/
-
             newGrantItem = getGranteeDetails(code);
+
             nameText.setText(newGrantItem.getFirstName() + " " + newGrantItem.getLastName());
             mobileText.setText(newGrantItem.getMobile());
             endDate.setText(dateFormat.format(newGrantItem.getEndDate()));
 
             grantButton.setEnabled(true);
             middlePanel.setVisibility(View.VISIBLE);
+
+            scanner.setStatusText("");
 
             beepManager.playBeepSoundAndVibrate();
         }
@@ -290,12 +285,12 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
                     String  endDate = r.getEndDate().substring(0, 10);
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                     item.setEndDate(format.parse(endDate));
+                    grantData.getListData().add(item);
                 }
             }
             catch (ParseException pe) {
                 Log.d(LOG_TAG, "Error parsing date in GuestUserActivity: " + pe.getMessage());
             }
-            grantData.getListData().add(item);
         }
         grantAdapter.notifyDataSetChanged();
 
@@ -323,7 +318,7 @@ public class GuestUserActivity extends AppCompatActivity implements View.OnClick
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String endDate = format.format(newGrantItem.getEndDate());
-        endDate += " 00:00:00.000";
+//        endDate += " 00:00:00.000";
         input.setEndDate(endDate);
 
         Gson gson = new Gson();

@@ -488,6 +488,18 @@ public class SharedPreferencesUtil {
         return buildingAuthList;
     }
 
+    public List<Authorization> getAuthorizationInfo(long buildingId, int orgId) {
+        List<Authorization> authList = getAuthorizationInfo();
+        List<Authorization> buildingAuthList = new ArrayList<Authorization>();
+        for (Authorization a : authList) {
+            if ((Long.parseLong(a.getBuildingId()) == buildingId)
+                    && (a.getOrganizationId() == orgId)) {
+                buildingAuthList.add(a);
+            }
+        }
+        return buildingAuthList;
+    }
+
     private String getCurrentDate() {
         DateFormat df = new SimpleDateFormat(DATE_FORMAT);
         Date today = Calendar.getInstance().getTime();

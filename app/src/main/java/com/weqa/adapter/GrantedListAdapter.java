@@ -87,7 +87,7 @@ public class GrantedListAdapter  extends RecyclerView.Adapter<GrantedListAdapter
         final GrantedListItem item = this.itemData.getListData().get(position);
         holder.name.setText(item.getFirstName() + " " + item.getLastName());
         holder.mobile.setText(item.getMobile());
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
         String gDate = formatter.format(item.getEndDate());
         holder.grantDate.setText(gDate);
         holder.grantDate.setOnClickListener(new View.OnClickListener() {
@@ -169,7 +169,7 @@ public class GrantedListAdapter  extends RecyclerView.Adapter<GrantedListAdapter
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String endDateString = format.format(endDate);
-        endDateString += " 00:00:00.000";
+//        endDateString += " 00:00:00.000";
         input.setEndDate(endDateString);
 
         Gson gson = new Gson();

@@ -15,11 +15,13 @@
 
         <TextView
             android:id="@+id/bookingmessage"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="none"
             android:scrollHorizontally="false"
-            android:textColor="@color/colorLighterGrey" />
+            android:textColor="@color/colorLighterGrey"
+            android:textAlignment="center"
+            android:text="Desk Booked for 2 hours and 20 seconds"/>
 
     </LinearLayout>
 

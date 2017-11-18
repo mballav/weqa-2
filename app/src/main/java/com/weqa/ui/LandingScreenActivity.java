@@ -289,11 +289,9 @@ public class LandingScreenActivity extends AppCompatActivity
         }
         else if (v.getId() == R.id.menu4) {
             Intent i = new Intent(this, TeamSummaryActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(i);
-        }
-        else if (v.getId() != R.id.menu1){
-            Toast.makeText(v.getContext(), R.string.under_dev, Toast.LENGTH_SHORT).show();
+            i.putExtra("SCREEN_FROM", "Landing");
+            i.setFlags(0);
+            this.startActivityForResult(i, 30);
         }
     }
 
@@ -335,7 +333,7 @@ public class LandingScreenActivity extends AppCompatActivity
                 if (tabLayoutWidth < deviceWidth) {
                     mTabLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
                     mTabLayout.setTabMode(TabLayout.MODE_FIXED);
-                    mTabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
+                    mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
                 } else {
                     mTabLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
                     mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
@@ -413,7 +411,8 @@ public class LandingScreenActivity extends AppCompatActivity
         long floorplanId = 0;
         for (Authorization a : authListOriginal) {
             if (Integer.parseInt(a.getFloorLevel()) == floorNumber
-                    && Integer.parseInt(a.getBuildingId()) == selectedBuildingId) {
+                    && Integer.parseInt(a.getBuildingId()) == selectedBuildingId
+                    && a.getOrganizationId() == defaultOrgId) {
                 floorplanId = Long.parseLong(a.getFloorPlanId());
             }
         }
@@ -473,7 +472,7 @@ public class LandingScreenActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Inside updateFloorplan - 3");
 
         if (buildingChanged) {
-            availData = new AvailListData(fr, util, selectedBuildingId);
+            availData = new AvailListData(fr, util, selectedBuildingId, defaultOrgId);
             buildingChanged = false;
         }
         else {
@@ -492,7 +491,7 @@ public class LandingScreenActivity extends AppCompatActivity
         } else {
             try {
                 File floorplanFile = new File(Environment.getExternalStorageDirectory(),
-                        "Pictures/floorplan_" + selectedBuildingId + "_" + f.getFloorPlanId().intValue());
+                        "Pictures/floorplan_" + defaultOrgId + "_" + selectedBuildingId + "_" + f.getFloorPlanId().intValue());
                 FileInputStream fis = new FileInputStream(floorplanFile);
 
                 decodedString = new byte[(int) (floorplanFile.length())];
@@ -582,14 +581,13 @@ public class LandingScreenActivity extends AppCompatActivity
     // Get the results:
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 20) {
+        if (requestCode == 20 || requestCode == 30) {
             updateBuildingAndFloorplanAvailability();
         }
         else {
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null) {
                 if (result.getContents() == null) {
-                    Toast.makeText(this, R.string.cancelled, Toast.LENGTH_LONG).show();
 /*                  QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
                     if (qrCodeUtil.isQRCodeValid(TEST_QR_CODE)) {
                         bookQRCodeItem(TEST_QR_CODE);
@@ -610,6 +608,18 @@ public class LandingScreenActivity extends AppCompatActivity
             } else {
                 super.onActivityResult(requestCode, resultCode, data);
             }
+        }
+    }
+
+    String testQRCode = "0001,1,2,2017-09-02 00:00:20";
+
+    private void testQRCode() {
+        QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
+        if (!qrCodeUtil.isQRItemCodeValid(testQRCode)) {
+            DialogUtil.showOkDialog(this, "Invalid WEQA CODE, Distance = " + qrCodeUtil.getDistance(), false, false);
+        }
+        else {
+            DialogUtil.showOkDialog(this, "Valid WEQA CODE, Distance = " + qrCodeUtil.getDistance(), false, false);
         }
     }
 
@@ -798,7 +808,7 @@ public class LandingScreenActivity extends AppCompatActivity
 
     public void showBookingRenewResponse(BookingResponse br, String qrCode) {
         if (br.getActionCode().equals(CodeConstants.RC302)) {
-            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+            String message = this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
             DialogUtil.showOkDialog(this, message, false, true);
             util.overwriteBooking(qrCode, qrCode, br.getBookedTime());
         }
@@ -842,39 +852,38 @@ public class LandingScreenActivity extends AppCompatActivity
         if (br.getActionCode().equals(CodeConstants.RC301)) {
             //util.appendBooking(qrCode, br.getBookedTime());
             DialogUtil.showOkDialogWithCancel(this,
-                    "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
+                    this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
                     qrCode, refreshFloorplan);
         } else if (br.getActionCode().equals(CodeConstants.RC601)) {
             //util.removeBooking(qrCode);
             if (showConfirmation)
-                DialogUtil.showOkDialog(this, "Desk is now released!", refreshHotspots, false);
+                DialogUtil.showOkDialog(this, this.getString(R.string.released), refreshHotspots, false);
         } else if (br.getActionCode().equals(CodeConstants.RC401)) {
-            String message = "Desk is not available - " + DatetimeUtil.getTimeDifference(br.getBookedTime())
-                    + " remaining on current booking.";
+            String message = this.getString(R.string.not_available) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
             DialogUtil.showOkDialog(this, message, false, true);
         }
         // If user has booked the same qrCode before and has scanned the same qrCode again.
         else if (br.getActionCode().equals(CodeConstants.RC501)) {
-            String message = "You still have " + DatetimeUtil.getTimeDifference(br.getBookedTime()) + " remaining on this booking";
+            String message = DatetimeUtil.getTimeDifference(br.getBookedTime()) + " " + this.getString(R.string.remaining);
             DialogUtil.showDialogWithThreeButtons(this, message, qrCode, refreshFloorplan);
         }
         // If user has already booked one qrCode and this is the second one booked
         else if (br.getActionCode().equals(CodeConstants.RC701)) {
             //util.appendBooking(qrCode, br.getBookedTime());
-            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+            String message = this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
 
             DialogUtil.showOkDialog(this, message, refreshFloorplan, true);
         }
         // If user has already booked one qrCode and this is the second one booked
         else if (br.getActionCode().equals(CodeConstants.RC702)) {
             //util.overwriteBooking(br.getPrevioudQrCode(), qrCode, br.getBookedTime());
-            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+            String message = this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
 
             DialogUtil.showOkDialog(this, message, refreshFloorplan, true);
         }
         // If user has already booked two desks, new booking is not allowed
         else if (br.getActionCode().equals(CodeConstants.RC801)) {
-            DialogUtil.showOkDialog(this, "You have exceeded your booking limit!", false, true);
+            DialogUtil.showOkDialog(this, this.getString(R.string.limit_exceeded), false, true);
         }
     }
 
@@ -965,7 +974,7 @@ public class LandingScreenActivity extends AppCompatActivity
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
 
         final SharedPreferencesUtil util = new SharedPreferencesUtil(this);
-        List<Authorization> authList = util.getAuthorizationInfo(selectedBuildingId);
+        List<Authorization> authList = util.getAuthorizationInfo(selectedBuildingId, defaultOrgId);
 
         final FloorplanInputV2 input = new FloorplanInputV2();
         input.setActionCodeItemType(CodeConstants.AC101);
@@ -980,9 +989,9 @@ public class LandingScreenActivity extends AppCompatActivity
             FloorPlan fp = new FloorPlan();
             fp.setFloorPlanId(Integer.parseInt(a.getFloorPlanId()));
             File floorplanFile = new File(Environment.getExternalStorageDirectory(),
-                    "Pictures/floorplan_" + selectedBuildingId + "_" + a.getFloorPlanId());
+                    "Pictures/floorplan_" + defaultOrgId + "_" + selectedBuildingId + "_" + a.getFloorPlanId());
             Log.d(LOG_TAG, "Checking if file exists: "
-                    + "Pictures/floorplan_" + selectedBuildingId + "_" + a.getFloorPlanId());
+                    + "Pictures/floorplan_" + defaultOrgId + "_" + selectedBuildingId + "_" + a.getFloorPlanId());
             if (floorplanFile.exists()) {
                 Log.d(LOG_TAG, "File exists!");
                 fp.setImageStatus(true);
@@ -1044,8 +1053,8 @@ public class LandingScreenActivity extends AppCompatActivity
 
             try {
                 File floorplanFile = new File(Environment.getExternalStorageDirectory(),
-                        "Pictures/floorplan_" + buildingId.intValue() + "_" + f.getFloorPlanId().intValue());
-                Log.d(LOG_TAG, "Saving to file: " + "Pictures/floorplan_" + buildingId.intValue() + "_" + f.getFloorPlanId().intValue());
+                        "Pictures/floorplan_" + defaultOrgId + "_" + buildingId.intValue() + "_" + f.getFloorPlanId().intValue());
+                Log.d(LOG_TAG, "Saving to file: " + "Pictures/floorplan_" + defaultOrgId + "_" + buildingId.intValue() + "_" + f.getFloorPlanId().intValue());
 
                 File picturesDir = new File(Environment.getExternalStorageDirectory(), "Pictures");
 
@@ -1069,7 +1078,7 @@ public class LandingScreenActivity extends AppCompatActivity
         Retrofit retrofit = RetrofitBuilder.getRetrofit();
 
         final SharedPreferencesUtil util = new SharedPreferencesUtil(this);
-        List<Authorization> authList = util.getAuthorizationInfo(selectedBuildingId);
+        List<Authorization> authList = util.getAuthorizationInfo(selectedBuildingId, defaultOrgId);
 
         final FloorplanInputV2 input = new FloorplanInputV2();
         input.setActionCodeItemType(CodeConstants.AC101);
@@ -1087,9 +1096,9 @@ public class LandingScreenActivity extends AppCompatActivity
                 fp.setFloorPlanId(Integer.parseInt(a.getFloorPlanId()));
 
                 File floorplanFile = new File(Environment.getExternalStorageDirectory(),
-                        "Pictures/floorplan_" + selectedBuildingId + "_" + a.getFloorPlanId());
+                        "Pictures/floorplan_" + defaultOrgId + "_" + selectedBuildingId + "_" + a.getFloorPlanId());
                 Log.d(LOG_TAG, "Checking if file exists: "
-                        + "Pictures/floorplan_" + selectedBuildingId + "_" + a.getFloorPlanId());
+                        + "Pictures/floorplan_" + defaultOrgId + "_" + selectedBuildingId + "_" + a.getFloorPlanId());
                 if (floorplanFile.exists()) {
                     Log.d(LOG_TAG, "File exists!");
                     fp.setImageStatus(true);

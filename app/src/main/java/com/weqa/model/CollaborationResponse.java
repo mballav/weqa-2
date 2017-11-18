@@ -5,8 +5,10 @@ package com.weqa.model;
  */
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.weqa.util.DatetimeUtil;
 
 import java.util.Comparator;
+import java.util.Date;
 
 public class CollaborationResponse {
 
@@ -110,7 +112,7 @@ public class CollaborationResponse {
         this.notFound = notFound;
     }
 
-    public static Comparator<CollaborationResponse> OrgNameComparator
+    public static Comparator<CollaborationResponse> OrgNameCreatedDateComparator
             = new Comparator<CollaborationResponse>() {
 
         public int compare(CollaborationResponse a1, CollaborationResponse a2) {
@@ -118,8 +120,15 @@ public class CollaborationResponse {
             String n1 = a1.getOrgName().toUpperCase();
             String n2 = a2.getOrgName().toUpperCase();
 
-            //ascending order
-            return n1.compareTo(n2);
+            Date d1 = DatetimeUtil.getDateFromAEDT(a1.getCreationDate());
+            Date d2 = DatetimeUtil.getDateFromAEDT(a2.getCreationDate());
+
+            if (n1.compareTo(n2) == 0) {
+                return d2.compareTo(d1);
+            }
+            else {
+                return n1.compareTo(n2);
+            }
         }
     };
 }

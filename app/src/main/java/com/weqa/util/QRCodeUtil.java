@@ -27,6 +27,8 @@ public class QRCodeUtil {
     private Context context;
     private double latitude, longitude;
 
+    private double distance;
+
     public QRCodeUtil(SharedPreferencesUtil util, Context context) {
         this.util = util;
         this.context = context;
@@ -39,6 +41,10 @@ public class QRCodeUtil {
             return 0L;
 
         return Long.parseLong(tokens[2]);
+    }
+
+    public double getDistance() {
+        return distance;
     }
 
     public boolean isQRItemCodeValid(String qrCode) {
@@ -104,7 +110,7 @@ public class QRCodeUtil {
             double lat1 = tracker.getLatitude();
             double lon1 = tracker.getLongitude();
 
-            double distance = LocationUtil.getDistance(lat1, lon1, latitude, longitude);
+            distance = LocationUtil.getDistance(lat1, lon1, latitude, longitude);
             Log.d(LOG_TAG, "Current Location(" + lat1 + "," + lon1 + "), Building (" + latitude + "," + longitude + ")");
             Log.d(LOG_TAG, "DISTANCE: " + distance);
             if (distance <= BUILDING_RADIUS) {

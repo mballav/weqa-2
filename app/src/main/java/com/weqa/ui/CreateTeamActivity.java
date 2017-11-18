@@ -143,9 +143,9 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
             public boolean onTouch(View v, MotionEvent event) {
                 ImageView i = (ImageView) v;
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    i.setColorFilter(ContextCompat.getColor(v.getContext(), R.color.colorTABtextSelected));
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     i.setColorFilter(ContextCompat.getColor(v.getContext(), R.color.colorDarkGrey));
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    i.setColorFilter(ContextCompat.getColor(v.getContext(), R.color.colorTABtextSelected));
                 }
                 return false;
             }
@@ -298,8 +298,6 @@ public class CreateTeamActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void updateUI() {
-
-        Toast.makeText(this, R.string.team_created, Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent();
         setResult(5, intent);

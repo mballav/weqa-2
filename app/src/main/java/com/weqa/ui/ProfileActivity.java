@@ -148,9 +148,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         if (view.getId() == R.id.orgContainer) {
             authenticate();
         }
-        else {
-            Toast.makeText(this, R.string.under_dev, Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void authenticate() {

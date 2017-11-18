@@ -38,6 +38,7 @@ public class TeamMemberScanActivity extends Activity implements View.OnClickList
     private BarcodeCallback callback = new BarcodeCallback() {
         @Override
         public void barcodeResult(BarcodeResult result) {
+
             String code = result.getText();
             if(code == null) {
                 return;
@@ -46,6 +47,8 @@ public class TeamMemberScanActivity extends Activity implements View.OnClickList
             if ((previousCodes.indexOf(code) != -1)) {
                 return;
             }
+
+            beepManager.playBeepSound();
 
             if (!isValidUserCode(code)) {
                 barcodeView.setStatusText("Invalid QR Code!");
@@ -72,7 +75,7 @@ public class TeamMemberScanActivity extends Activity implements View.OnClickList
             previousCodes.add(code);
             String name = addUser(code);
             barcodeView.setStatusText(name + " successfully added!");
-            beepManager.playBeepSoundAndVibrate();
+
         }
 
         @Override
@@ -101,6 +104,7 @@ public class TeamMemberScanActivity extends Activity implements View.OnClickList
         barcodeView.decodeContinuous(callback);
 
         beepManager = new BeepManager(this);
+        beepManager.setBeepEnabled(true);
 
         Button doneButton = (Button) findViewById(R.id.doneButton);
         doneButton.setOnClickListener(this);

@@ -65,12 +65,16 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
     private SharedPreferencesUtil util;
     private int orgId;
     private int privilegeId;
+    private String screenFrom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new GlobalExceptionHandler(this));
         setContentView(R.layout.activity_team_summary);
+
+        Intent i = getIntent();
+        screenFrom = i.getStringExtra("SCREEN_FROM");
 
         teamSummaryList = (RecyclerView) findViewById(R.id.teamSummaryList);
 
@@ -217,10 +221,12 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
             this.startActivityForResult(i, 20);
         }
         else if (v.getId() == R.id.menu1) {
-            this.finish();
-        }
-        else if (v.getId() != R.id.menu4){
-            Toast.makeText(v.getContext(), R.string.under_dev, Toast.LENGTH_SHORT).show();
+            if (screenFrom != null &&
+                    (screenFrom.equals("Landing"))) {
+                Intent intent = new Intent();
+                setResult(30, intent);
+            }
+            finish();
         }
     }
 
@@ -237,7 +243,6 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (result != null) {
                 if (result.getContents() == null) {
-                    Toast.makeText(this, R.string.cancelled, Toast.LENGTH_LONG).show();QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
                 } else {
                     String qrCode = result.getContents();
                     QRCodeUtil qrCodeUtil = new QRCodeUtil(util, this);
@@ -433,7 +438,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
 
     public void showBookingRenewResponse(BookingResponse br, String qrCode) {
         if (br.getActionCode().equals(CodeConstants.RC302)) {
-            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+            String message = this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
             DialogUtil.showOkDialog(this, message, true);
             util.overwriteBooking(qrCode, qrCode, br.getBookedTime());
         }
@@ -467,40 +472,39 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         if (br.getActionCode().equals(CodeConstants.RC301)) {
             //util.appendBooking(qrCode, br.getBookedTime());
             DialogUtil.showOkDialogWithCancel(this,
-                    "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
+                    this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime()),
                     qrCode);
         }
         // If user has booked the same qrCode before and has scanned the same qrCode again.
         else if (br.getActionCode().equals(CodeConstants.RC501)) {
-            String message = "You still have " + DatetimeUtil.getTimeDifference(br.getBookedTime()) + " remaining on this booking";
+            String message = DatetimeUtil.getTimeDifference(br.getBookedTime()) + " " + this.getString(R.string.remaining);
             DialogUtil.showDialogWithThreeButtons(this, message, qrCode);
         }
         else if (br.getActionCode().equals(CodeConstants.RC601)) {
             //util.removeBooking(qrCode);
             if (showConfirmation)
-                DialogUtil.showOkDialog(this, "Desk is now released!", false);
+                DialogUtil.showOkDialog(this, this.getString(R.string.released), false);
         } else if (br.getActionCode().equals(CodeConstants.RC401)) {
-            String message = "Desk is not available - " + DatetimeUtil.getTimeDifference(br.getBookedTime())
-                    + " remaining on current booking.";
+            String message = this.getString(R.string.not_available) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
             DialogUtil.showOkDialog(this, message, true);
         }
         // If user has already booked one qrCode and this is the second one booked
         else if (br.getActionCode().equals(CodeConstants.RC701)) {
             //util.appendBooking(qrCode, br.getBookedTime());
-            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+            String message = this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
 
             DialogUtil.showOkDialog(this, message, true);
         }
         // If user has already booked one qrCode and this is the second one booked
         else if (br.getActionCode().equals(CodeConstants.RC702)) {
             //util.overwriteBooking(br.getPrevioudQrCode(), qrCode, br.getBookedTime());
-            String message = "Desk is successfully booked for next " + DatetimeUtil.getTimeDifference(br.getBookedTime());
+            String message = this.getString(R.string.booked) + " " + DatetimeUtil.getTimeDifference(br.getBookedTime());
 
             DialogUtil.showOkDialog(this, message, true);
         }
         // If user has already booked two desks, new booking is not allowed
         else if (br.getActionCode().equals(CodeConstants.RC801)) {
-            DialogUtil.showOkDialog(this, "You have exceeded your booking limit!", true);
+            DialogUtil.showOkDialog(this, this.getString(R.string.limit_exceeded), true);
         }
         fetchTeamData();
     }
@@ -511,7 +515,7 @@ public class TeamSummaryActivity extends AppCompatActivity implements View.OnCli
         String previousOrg = "";
 
         CollaborationResponse[] responsesArray = responses.toArray(new CollaborationResponse[responses.size()]);
-        Arrays.sort(responsesArray, CollaborationResponse.OrgNameComparator);
+        Arrays.sort(responsesArray, CollaborationResponse.OrgNameCreatedDateComparator);
 
         for (CollaborationResponse r : responsesArray) {
             if (!previousOrg.equals(r.getOrgName())) {

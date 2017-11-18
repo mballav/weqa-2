@@ -40,7 +40,7 @@ import retrofit2.Retrofit;
  * Created by Manish Ballav on 10/15/2017.
  */
 
-public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItemHolder> {
+public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItemHolder> implements View.OnClickListener {
 
     private static final String LOG_TAG = "WEQA-LOG";
 
@@ -88,6 +88,33 @@ public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItem
     @Override
     public void onBindViewHolder(OrgListAdapter.OrgItemHolder holder, int position) {
         final OrgListItem item = this.itemData.getListData().get(position);
+        View.OnClickListener listener1 = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (view.getId() == R.id.guestText) {
+                    Intent i = new Intent(c, GuestUserActivity.class);
+                    i.putExtra("ORG_ID", item.getOrganizationId());
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    c.startActivity(i);
+                }
+                else if (view.getId() == R.id.orgContainer) {
+                    RelativeLayout orgC = (RelativeLayout) view;
+                    ImageView i = orgC.findViewById(R.id.defaultImage);
+                    if (defaultOrgImage != i) {
+                        i.setColorFilter(ContextCompat.getColor(c, R.color.colorGreen));
+                        if (defaultOrgImage != null) {
+                            defaultOrgImage.setColorFilter(ContextCompat.getColor(c, R.color.colorLightGrey));
+                        }
+                        util.setDefaultOrganization(item.getOrganizationId());
+                        defaultOrgImage = i;
+                    }
+                    Intent intent = new Intent(c, LandingScreenActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    c.startActivity(intent);
+                }
+            }
+        };
         holder.orgName.setText(item.getOrgName());
         if (item.getPrivilege().equals("Guest")) {
             SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
@@ -99,15 +126,7 @@ public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItem
         }
         if (item.getPrivilege().equals("Admin")) {
             holder.guestAccess.setVisibility(View.VISIBLE);
-            holder.guestAccess.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent i = new Intent(c, GuestUserActivity.class);
-                    i.putExtra("ORG_ID", item.getOrganizationId());
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    c.startActivity(i);
-                }
-            });
+            holder.guestAccess.setOnClickListener(listener1);
         }
         else {
             holder.guestAccess.setVisibility(View.GONE);
@@ -120,29 +139,16 @@ public class OrgListAdapter  extends RecyclerView.Adapter<OrgListAdapter.OrgItem
         else {
             holder.defaultOrg.setColorFilter(ContextCompat.getColor(c, R.color.colorLightGrey));
         }
-        holder.orgContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RelativeLayout orgC = (RelativeLayout) view;
-                ImageView i = orgC.findViewById(R.id.defaultImage);
-                if (defaultOrgImage != i) {
-                    i.setColorFilter(ContextCompat.getColor(c, R.color.colorGreen));
-                    if (defaultOrgImage != null) {
-                        defaultOrgImage.setColorFilter(ContextCompat.getColor(c, R.color.colorLightGrey));
-                    }
-                    util.setDefaultOrganization(item.getOrganizationId());
-                    defaultOrgImage = i;
-                }
-                Intent intent = new Intent(c, LandingScreenActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                c.startActivity(intent);
-            }
-        });
+        holder.orgContainer.setOnClickListener(listener1);
     }
 
     @Override
     public int getItemCount() {
         return this.itemData.getListData().size();
+    }
+
+    @Override
+    public void onClick(View view) {
     }
 
 }

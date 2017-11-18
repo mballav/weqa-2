@@ -57,6 +57,8 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
                 return;
             }
 
+            beepManager.playBeepSound();
+
             if (!isValidUserCode(code)) {
                 barcodeView.setStatusText("Invalid QR Code!");
                 return;
@@ -82,7 +84,6 @@ public class CustomQRScannerActivity extends Activity implements View.OnClickLis
             previousCodes.add(code);
             String name = addUser(code);
             barcodeView.setStatusText(name + " successfully added!");
-            beepManager.playBeepSoundAndVibrate();
         }
 
         @Override

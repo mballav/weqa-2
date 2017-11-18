@@ -21,12 +21,14 @@ public class AvailListData {
     private SharedPreferencesUtil util;
     private List<Authorization> authList;
     private long buildingId;
+    private int defaultOrgId;
 
-    public AvailListData(FloorplanResponseV2 r, SharedPreferencesUtil util, long selectedBuildingId) {
+    public AvailListData(FloorplanResponseV2 r, SharedPreferencesUtil util, long selectedBuildingId, int defaultOrgId) {
         this.response = r;
         this.util = util;
         this.buildingId = selectedBuildingId;
-        this.authList = this.util.getAuthorizationInfo(selectedBuildingId);
+        this.authList = this.util.getAuthorizationInfo(selectedBuildingId, defaultOrgId);
+        this.defaultOrgId = defaultOrgId;
     }
 
     public void update(FloorplanResponseV2 rUpdate) {
