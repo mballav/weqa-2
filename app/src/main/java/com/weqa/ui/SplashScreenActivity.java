@@ -1,6 +1,8 @@
 package com.weqa.ui;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -44,7 +47,10 @@ import com.weqa.util.async.AuthWithCodeAsyncTask;
 import com.weqa.util.GlobalExceptionHandler;
 import com.weqa.util.SharedPreferencesUtil;
 import com.weqa.util.async.GetRegistrationAsyncTask;
+import com.weqa.util.ui.DialogUtil;
 import com.weqa.util.ui.KeyboardUtil;
+
+import java.util.ArrayList;
 
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -110,20 +116,45 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
             requestPermissions();
 
             if (!isLocationEnabled()) {
-                Toast.makeText(this, R.string.turn_on_location, Toast.LENGTH_LONG).show();
-                thread.start();
+                showOkDialog(this.getString(R.string.turn_on_location));
             }
             else if (!areNotificationsEnabled()) {
-                Toast.makeText(this, R.string.enable_notification, Toast.LENGTH_LONG).show();
-                thread.start();
+                showOkDialog(this.getString(R.string.enable_notification));
             }
             else if (!isConnected()) {
-                Toast.makeText(this, R.string.turn_on_internet, Toast.LENGTH_LONG).show();
-                thread.start();
+                showOkDialog(this.getString(R.string.turn_on_internet));
             }
 
             authenticate();
         }
+    }
+
+    public void showOkDialog(String textToDisplay) {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_booking);
+
+        // set the custom dialog components - text, image and button
+        TextView text = (TextView) dialog.findViewById(R.id.bookingmessage);
+        text.setText(textToDisplay);
+
+
+        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
+        cancelButton.setVisibility(View.GONE);
+
+        Button okButton = (Button) dialog.findViewById(R.id.okButton);
+        // if button is clicked, close the custom dialog
+        okButton.setText("Close");
+        okButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    SplashScreenActivity.this.finish();
+                }
+            });
+
+        dialog.show();
     }
 
     private void authenticate() {
@@ -247,13 +278,81 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
         }
     }
 
-    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 100;
-    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 101;
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 102;
+    private static final int MY_PERMISSIONS_REQUEST = 100;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 101;
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 102;
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 103;
 
     private void requestPermissions() {
-        requestPermissionForCamera();
+
+        ArrayList<String> arrPerm = new ArrayList<>();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            arrPerm.add(Manifest.permission.CAMERA);
+        }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            arrPerm.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            arrPerm.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if(!arrPerm.isEmpty()) {
+            String[] permissions = new String[arrPerm.size()];
+            permissions = arrPerm.toArray(permissions);
+            ActivityCompat.requestPermissions(this, permissions, MY_PERMISSIONS_REQUEST);
+        }
+
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0) {
+                    for(int i = 0; i < grantResults.length; i++) {
+                        String permission = permissions[i];
+                        if(Manifest.permission.CAMERA.equals(permission)) {
+                            if(grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                                // you do not have permission
+                                Toast.makeText(this, R.string.no_access_camera, Toast.LENGTH_LONG).show();
+                                thread.start();
+                                break;
+
+                            }
+                        }
+                        if(Manifest.permission.ACCESS_FINE_LOCATION.equals(permission)) {
+                            if(grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                                // you do not have permission
+                                Toast.makeText(this, R.string.no_access_location, Toast.LENGTH_LONG).show();
+                                thread.start();
+                                break;
+                            }
+                        }
+                        if(Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)) {
+                            if(grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                                // you do not have permission
+                                Toast.makeText(this, R.string.no_access_storage, Toast.LENGTH_LONG).show();
+                                thread.start();
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, R.string.no_access_camera, Toast.LENGTH_LONG).show();
+                    thread.start();
+                }
+                break;
+            }
+        }
+
+        // other 'case' lines to check for other
+        // permissions this app might request
+    }
+
 
     private void requestPermissionForCamera() {
 
@@ -301,6 +400,7 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
         }
     }
 
+    /*
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -340,5 +440,5 @@ public class SplashScreenActivity extends AppCompatActivity implements AuthAsync
                 return;
             }
         }
-    }
+    }*/
 }

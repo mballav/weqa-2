@@ -15,9 +15,9 @@
 
     <!-- SplashScreenActivity -->
     <string name="os_version_old">Phone not supported</string>
-    <string name="turn_on_location">Enable location services</string>
-    <string name="enable_notification">Enable notifications</string>
-    <string name="turn_on_internet">No internet connectivity</string>
+    <string name="turn_on_location">WEQA requires location services enabled! Please do so and come back.</string>
+    <string name="enable_notification">WEQA requires notifications enabled! Please do so and come back.</string>
+    <string name="turn_on_internet">WEQA requires Internet connectivity! Please turn it on and come back.</string>
     <string name="no_access_camera">Camera permission required</string>
     <string name="no_access_location">Location permission required</string>
     <string name="no_access_storage">Storage permission required</string>
